@@ -368,6 +368,15 @@ function calcRoundPoints(picks) {
   return rp;
 }
 
+// Determine the latest round that has any results
+function getMaxActiveRound() {
+  let maxRd = 0;
+  for (const t of Object.values(RESULTS)) {
+    if (t.round && t.round > maxRd) maxRd = t.round;
+  }
+  return maxRd || 1;
+}
+
 function calcAlive(picks) {
   let alive = 0, eliminated = 0;
   for (const [, team] of Object.entries(picks)) {
@@ -564,7 +573,8 @@ function renderTable() {
         <td class="col-name">${e.name}${buildTooltip(e.name, e.picks)}</td>
         <td class="col-pts">${e.pts}</td>
         <td class="col-odds"><span class="${o.cls}">${o.str}</span></td>`;
-      for (let r = 1; r <= 6; r++) h += `<td class="col-rd">${e.rp[r] || "—"}</td>`;
+      const maxRd = getMaxActiveRound();
+      for (let r = 1; r <= 6; r++) h += `<td class="col-rd">${r <= maxRd ? (e.rp[r] || 0) : "—"}</td>`;
       h += `<td class="col-alive">${e.alive}</td>
         <td class="col-elim">${e.eliminated}</td>
         <td class="col-max">${e.max}</td>
