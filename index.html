@@ -121,6 +121,28 @@ tr:hover td { background:rgba(245,166,35,.03); }
 .pick.p { color:var(--muted); }
 .tbl-foot { font-size:11px; color:var(--muted); padding:8px 12px; font-style:italic; }
 
+/* Bracket View */
+#bracketWrap { display:none; }
+#bracketWrap.show { display:block; }
+.bracket-regions { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+@media(max-width:900px) { .bracket-regions { grid-template-columns:1fr; } }
+.region-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:16px; overflow-x:auto; }
+.region-title { font-size:14px; font-weight:800; color:var(--accent); text-transform:uppercase; letter-spacing:1px; margin-bottom:12px; text-align:center; }
+.bracket-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; align-items:start; }
+.brk-round-hd { text-align:center; font-size:10px; color:var(--muted); font-weight:700; text-transform:uppercase; letter-spacing:.5px; margin-bottom:4px; }
+.brk-game { background:var(--card2); border:1px solid var(--border); border-radius:8px; margin-bottom:6px; overflow:hidden; }
+.brk-team { display:flex; align-items:center; padding:5px 8px; gap:6px; font-size:11px; border-bottom:1px solid rgba(255,255,255,.05); }
+.brk-team:last-child { border-bottom:none; }
+.brk-seed { color:var(--accent); font-weight:800; font-size:10px; min-width:16px; text-align:right; }
+.brk-name { flex:1; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.brk-team.win { background:rgba(0,210,106,.1); }
+.brk-team.win .brk-name { color:var(--green); font-weight:800; }
+.brk-team.lose .brk-name { color:var(--red); opacity:.4; text-decoration:line-through; }
+.brk-team.pending .brk-name { color:var(--muted); }
+.brk-ff { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-top:20px; }
+.ff-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:16px; text-align:center; }
+.ff-title { font-size:14px; font-weight:800; color:var(--accent); letter-spacing:1px; margin-bottom:10px; }
+
 /* Admin */
 .admin-toggle { background:var(--card2); border:1px solid var(--border); padding:8px 16px; border-radius:8px; color:var(--accent); cursor:pointer; font-size:12px; font-weight:600; font-family:inherit; margin-bottom:10px; }
 .admin-panel { background:var(--card); border:1px solid var(--accent); border-radius:12px; padding:20px; margin-bottom:16px; display:none; }
@@ -188,10 +210,12 @@ tr:hover td { background:rgba(245,166,35,.03); }
       <div class="view-btns" id="viewBtns">
         <button class="active" onclick="setView('board',this)">Rankings</button>
         <button onclick="setView('picks',this)">All Picks</button>
+        <button onclick="setView('bracket',this)">Bracket</button>
       </div>
     </div>
   </div>
   <div class="tbl-wrap"><table id="tbl"></table></div>
+  <div id="bracketWrap"></div>
 </div>
 
 <div class="footer">
@@ -607,7 +631,154 @@ function setView(v, btn) {
   currentView = v;
   document.querySelectorAll(".view-btns button").forEach(b => b.classList.remove("active"));
   btn.classList.add("active");
-  renderTable();
+  const tblWrap = document.querySelector(".tbl-wrap");
+  const brkWrap = document.getElementById("bracketWrap");
+  if (v === "bracket") {
+    tblWrap.style.display = "none";
+    brkWrap.classList.add("show");
+    renderBracket();
+  } else {
+    tblWrap.style.display = "";
+    brkWrap.classList.remove("show");
+    renderTable();
+  }
+}
+
+// ============ BRACKET DATA ============
+const BRACKET = {
+  "East": {
+    r1: [
+      [[1,"Duke"],[16,"Siena"]],
+      [[8,"Ohio State"],[9,"TCU"]],
+      [[5,"St Johns"],[12,"Northern Iowa"]],
+      [[4,"Kansas"],[13,"California Baptist"]],
+      [[6,"Louisville"],[11,"South Florida"]],
+      [[3,"Michigan St"],[14,"North Dakota State"]],
+      [[7,"UCLA"],[10,"UCF"]],
+      [[2,"UCONN"],[15,"Furman"]]
+    ]
+  },
+  "South": {
+    r1: [
+      [[1,"Florida"],[16,"Prairie View AM"]],
+      [[8,"Clemson"],[9,"Iowa"]],
+      [[5,"Vanderbilt"],[12,"McNeese"]],
+      [[4,"Nebraska"],[13,"Troy"]],
+      [[6,"North Carolina"],[11,"VCU"]],
+      [[3,"Illinois"],[14,"U Penn"]],
+      [[7,"Saint Mary's"],[10,"Texas AM"]],
+      [[2,"Houston"],[15,"Idaho"]]
+    ]
+  },
+  "West": {
+    r1: [
+      [[1,"Arizona"],[16,"LIU"]],
+      [[8,"Villanova"],[9,"Utah State"]],
+      [[5,"Wisconsin"],[12,"High Point"]],
+      [[4,"Arkansas"],[13,"Hawaii"]],
+      [[6,"BYU"],[11,"Texas"]],
+      [[3,"Gonzaga"],[14,"Kennesaw St"]],
+      [[7,"Miami FL"],[10,"Missouri"]],
+      [[2,"Purdue"],[15,"Queens"]]
+    ]
+  },
+  "Midwest": {
+    r1: [
+      [[1,"Michigan"],[16,"Howard"]],
+      [[8,"Georgia"],[9,"Saint Louis"]],
+      [[5,"Texas Tech"],[12,"Akron"]],
+      [[4,"Alabama"],[13,"Hofstra"]],
+      [[6,"Tennessee"],[11,"Miami OH"]],
+      [[3,"Virginia"],[14,"Wright State"]],
+      [[7,"Kentucky"],[10,"Santa Clara"]],
+      [[2,"Iowa State"],[15,"Tennessee State"]]
+    ]
+  }
+};
+
+function getR2Matchups(r1) {
+  // R2 matchups: winners of games 0v1, 2v3, 4v5, 6v7
+  const pairs = [[0,1],[2,3],[4,5],[6,7]];
+  return pairs.map(([a,b]) => {
+    const wA = getWinner(r1[a]);
+    const wB = getWinner(r1[b]);
+    return [wA, wB];
+  });
+}
+
+function getS16Matchups(r2) {
+  const pairs = [[0,1],[2,3]];
+  return pairs.map(([a,b]) => {
+    const wA = getR2Winner(r2[a]);
+    const wB = getR2Winner(r2[b]);
+    return [wA, wB];
+  });
+}
+
+function getWinner(game) {
+  const [a, b] = game;
+  const sA = getTeamStatus(a[1]), sB = getTeamStatus(b[1]);
+  if (sA.status === "won" || sB.status === "lost") return a;
+  if (sB.status === "won" || sA.status === "lost") return b;
+  return null;
+}
+
+function getR2Winner(pair) {
+  if (!pair[0] || !pair[1]) return null;
+  const sA = getTeamStatus(pair[0][1]), sB = getTeamStatus(pair[1][1]);
+  if (sA.status === "won" && sA.round >= 2) return pair[0];
+  if (sB.status === "won" && sB.round >= 2) return pair[1];
+  if (sA.status === "lost" && sA.round === 2) return pair[1];
+  if (sB.status === "lost" && sB.round === 2) return pair[0];
+  return null;
+}
+
+function teamCls(team) {
+  if (!team) return "pending";
+  const s = getTeamStatus(team[1]);
+  if (s.status === "won") return "win";
+  if (s.status === "lost") return "lose";
+  return "pending";
+}
+
+function teamHtml(team, fallback) {
+  if (!team) return `<div class="brk-team pending"><span class="brk-seed">—</span><span class="brk-name">${fallback || "TBD"}</span></div>`;
+  return `<div class="brk-team ${teamCls(team)}"><span class="brk-seed">${team[0]}</span><span class="brk-name">${team[1]}</span></div>`;
+}
+
+function renderBracket() {
+  const wrap = document.getElementById("bracketWrap");
+  let h = `<div class="bracket-regions">`;
+  for (const [region, data] of Object.entries(BRACKET)) {
+    const r1 = data.r1;
+    const r2 = getR2Matchups(r1);
+    const s16 = getS16Matchups(r2);
+    h += `<div class="region-card"><div class="region-title">${region} Region</div>`;
+    h += `<div class="bracket-grid">`;
+    // R1 column
+    h += `<div><div class="brk-round-hd">Round 1</div>`;
+    for (const game of r1) {
+      h += `<div class="brk-game">${teamHtml(game[0])}${teamHtml(game[1])}</div>`;
+    }
+    h += `</div>`;
+    // R2 column
+    h += `<div><div class="brk-round-hd">Round 2</div>`;
+    for (let i = 0; i < 4; i++) {
+      const a = r2[i][0], b = r2[i][1];
+      h += `<div class="brk-game" style="margin-top:${i===0?'12':'18'}px">${teamHtml(a)}${teamHtml(b)}</div>`;
+    }
+    h += `</div>`;
+    // Sweet 16 column
+    h += `<div><div class="brk-round-hd">Sweet 16</div>`;
+    for (let i = 0; i < 2; i++) {
+      const a = s16[i][0], b = s16[i][1];
+      h += `<div class="brk-game" style="margin-top:${i===0?'38':'50'}px">${teamHtml(a)}${teamHtml(b)}</div>`;
+    }
+    h += `</div>`;
+    h += `</div></div>`;
+  }
+  h += `</div>`;
+  wrap.innerHTML = h;
 }
 
 // ============ ADMIN ============
