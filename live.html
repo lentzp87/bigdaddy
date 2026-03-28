@@ -760,12 +760,15 @@ const PAYOUTS = {
 
 // ============ TOURNAMENT RESULTS ============
 const RESULTS = {
+  // === Elite 8 WINNERS (in Final Four) ===
+  "Illinois":    {status:"won", round:4},
   // === Sweet 16 WINNERS (in Elite 8) ===
-  "Illinois":    {status:"won", round:3},
   "Duke":        {status:"won", round:3},
   "Michigan":    {status:"won", round:3},
   "UCONN":       {status:"won", round:3},
   "Tennessee":   {status:"won", round:3},
+  // === Elite 8 LOSERS ===
+  "Iowa":        {status:"lost", round:4},
   // === Sweet 16 LOSERS ===
   "Houston":     {status:"lost", round:3},
   "Texas":       {status:"lost", round:3},
@@ -786,7 +789,6 @@ const RESULTS = {
   // === Sunday R2 WINNERS (Sweet 16) ===
   "Arizona":     {status:"won", round:3},
   "Purdue":      {status:"won", round:3},
-  "Iowa":        {status:"won", round:3},
   "VCU":         {status:"lost", round:2},
   // === Sunday R2 LOSERS ===
   "Florida":     {status:"lost", round:2},
