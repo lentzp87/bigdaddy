@@ -1,0 +1,1363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Big Daddy Seed Pool 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0e17;
+  --card: #141b2d;
+  --card2: #1b2540;
+  --accent: #f5a623;
+  --accent2: #4a90d9;
+  --green: #00d26a;
+  --red: #ff4757;
+  --text: #eaf0f6;
+  --muted: #7b8fa3;
+  --border: #1e2d45;
+  --gold: #ffd700;
+  --silver: #c0c0c0;
+  --bronze: #cd7f32;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Inter',system-ui,sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
+
+/* Header */
+.hero { background:linear-gradient(135deg, #0d1b2a 0%, #1b2a4a 50%, #0d1b2a 100%); padding:32px 24px 24px; text-align:center; position:relative; overflow:hidden; border-bottom:2px solid var(--accent); }
+.hero::before { content:''; position:absolute; top:-50%; left:-50%; width:200%; height:200%; background:radial-gradient(ellipse at 30% 50%, rgba(245,166,35,.08) 0%, transparent 50%); }
+.hero h1 { font-size:clamp(22px,4vw,36px); font-weight:900; letter-spacing:2px; position:relative; }
+.hero h1 .gold { color:var(--accent); }
+.hero .year { font-size:clamp(12px,2vw,15px); color:var(--accent); font-weight:700; letter-spacing:4px; margin-top:4px; position:relative; }
+.hero .updated { font-size:12px; color:var(--muted); margin-top:8px; position:relative; }
+.hero-tip { position:absolute; top:16px; right:16px; z-index:5; }
+.hero-tip .venmo-btn { font-size:12px; padding:8px 16px; }
+
+/* Tier Selector */
+.tier-bar { display:flex; justify-content:center; gap:6px; padding:14px; background:var(--card); border-bottom:1px solid var(--border); }
+.tier-btn { padding:10px 28px; border-radius:50px; cursor:pointer; font-weight:700; font-size:14px; border:2px solid var(--border); background:transparent; color:var(--muted); transition:all .25s; font-family:inherit; }
+.tier-btn:hover { border-color:var(--accent); color:var(--text); transform:translateY(-1px); }
+.tier-btn.active { background:linear-gradient(135deg, var(--accent), #e09000); color:#000; border-color:var(--accent); box-shadow:0 4px 15px rgba(245,166,35,.3); }
+.tier-btn .sub { font-size:10px; font-weight:500; opacity:.7; display:block; margin-top:1px; }
+
+/* Main Layout */
+.main { max-width:1500px; margin:0 auto; padding:16px; }
+
+/* Stats Cards */
+.stats { display:grid; grid-template-columns:repeat(auto-fit, minmax(150px,1fr)); gap:10px; margin-bottom:16px; }
+.stat { background:var(--card); border-radius:12px; padding:14px 16px; text-align:center; border:1px solid var(--border); position:relative; overflow:hidden; }
+.stat::after { content:''; position:absolute; top:0; left:0; right:0; height:2px; }
+.stat.prize::after { background:var(--accent); }
+.stat.leader::after { background:var(--green); }
+.stat.avg::after { background:var(--accent2); }
+.stat.games::after { background:#a855f7; }
+.stat .lbl { font-size:10px; text-transform:uppercase; letter-spacing:1.5px; color:var(--muted); font-weight:600; }
+.stat .val { font-size:clamp(20px,3vw,30px); font-weight:900; margin-top:4px; }
+.stat.prize .val { color:var(--accent); }
+.stat.leader .val { font-size:clamp(13px,2vw,16px); color:var(--green); }
+.stat.leader .sub { font-weight:800; font-size:18px; }
+
+/* Payouts Panel */
+.payouts-toggle { width:100%; background:var(--card); border:1px solid var(--border); padding:12px; border-radius:10px; color:var(--accent); cursor:pointer; font-size:14px; font-weight:700; font-family:inherit; margin-bottom:12px; text-align:left; transition:all .2s; }
+.payouts-toggle:hover { border-color:var(--accent); }
+.payouts-panel { display:none; background:var(--card); border:1px solid var(--accent); border-radius:12px; padding:20px; margin-bottom:16px; }
+.payouts-panel.show { display:block; }
+.payout-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+@media(max-width:600px) { .payout-grid { grid-template-columns:1fr; } }
+.payout-section h4 { color:var(--accent); font-size:13px; text-transform:uppercase; letter-spacing:1px; margin-bottom:8px; border-bottom:1px solid var(--border); padding-bottom:6px; }
+.payout-row { display:flex; justify-content:space-between; padding:4px 0; font-size:13px; }
+.payout-row .place { color:var(--muted); }
+.payout-row .amount { color:var(--green); font-weight:700; }
+
+/* Section Headers */
+.sec-head { display:flex; align-items:center; justify-content:space-between; margin:18px 0 10px; flex-wrap:wrap; gap:10px; }
+.sec-title { font-size:18px; font-weight:800; display:flex; align-items:center; gap:8px; }
+.sec-title .bar { width:4px; height:22px; background:var(--accent); border-radius:2px; }
+.controls { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+.search { background:var(--card); border:1px solid var(--border); border-radius:50px; padding:8px 16px; color:var(--text); font-size:13px; width:220px; font-family:inherit; }
+.search:focus { outline:none; border-color:var(--accent); }
+.view-btns { display:flex; border:1px solid var(--border); border-radius:50px; overflow:hidden; }
+.view-btns button { padding:7px 16px; background:var(--card); color:var(--muted); border:none; cursor:pointer; font-size:12px; font-weight:600; font-family:inherit; transition:all .2s; }
+.view-btns button.active { background:var(--accent); color:#000; }
+
+/* Table */
+.tbl-wrap { overflow-x:auto; border-radius:12px; border:1px solid var(--border); background:var(--card); margin-bottom:20px; }
+.tbl-wrap::-webkit-scrollbar { height:6px; }
+.tbl-wrap::-webkit-scrollbar-thumb { background:var(--border); border-radius:3px; }
+table { width:100%; border-collapse:collapse; }
+th { background:var(--card2); padding:10px 12px; font-size:11px; text-transform:uppercase; letter-spacing:.7px; color:var(--muted); text-align:left; position:sticky; top:0; z-index:2; font-weight:700; }
+td { padding:8px 12px; border-bottom:1px solid var(--border); font-size:13px; }
+tr:hover td { background:rgba(245,166,35,.03); }
+.col-rank { width:50px; text-align:center; font-weight:900; }
+.col-rank.r1 { color:var(--gold); font-size:20px; }
+.col-rank.r2 { color:var(--silver); font-size:18px; }
+.col-rank.r3 { color:var(--bronze); font-size:16px; }
+.col-rank:not(.r1):not(.r2):not(.r3) { color:var(--accent); }
+.col-name { font-weight:700; position:relative; cursor:pointer; }
+.col-name .tt { display:none; position:absolute; left:0; top:100%; z-index:100; background:#1a2340; border:1px solid var(--accent); border-radius:10px; padding:10px 14px; min-width:280px; max-width:360px; box-shadow:0 8px 30px rgba(0,0,0,.6); pointer-events:none; }
+.col-name:hover .tt { display:block; }
+.tt-title { font-size:12px; color:var(--accent); font-weight:800; margin-bottom:6px; letter-spacing:.5px; border-bottom:1px solid var(--border); padding-bottom:5px; }
+.tt-row { display:flex; justify-content:space-between; font-size:11px; padding:2px 0; gap:6px; }
+.tt-row .tt-team { color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; flex:1; }
+.tt-row .tt-seed { color:var(--muted); width:18px; text-align:right; flex-shrink:0; }
+.tt-row .tt-val { font-weight:700; width:32px; text-align:right; flex-shrink:0; }
+.tt-row.tt-won .tt-val { color:var(--green); }
+.tt-row.tt-lost .tt-val { color:var(--red); opacity:.6; }
+.tt-row.tt-pend .tt-val { color:var(--muted); }
+.tt-total { display:flex; justify-content:space-between; font-size:12px; font-weight:900; margin-top:5px; border-top:1px solid var(--border); padding-top:5px; color:var(--accent); }
+.col-pts { text-align:right; font-weight:900; font-size:16px; color:var(--green); }
+.col-odds { text-align:right; font-weight:700; font-size:13px; white-space:nowrap; }
+.odds-fav { color:var(--green); }
+.odds-long { color:var(--accent); }
+.odds-dead { color:var(--red); opacity:.5; }
+.col-alive { text-align:center; color:var(--accent2); font-weight:600; }
+.col-elim { text-align:center; color:var(--red); opacity:.7; }
+.col-max { text-align:right; color:var(--muted); font-size:12px; }
+.col-rd { text-align:right; font-size:12px; color:var(--muted); font-weight:600; }
+.pick { font-size:11px; padding:4px 6px !important; text-align:center; white-space:nowrap; }
+.pick.w { background:rgba(0,210,106,.12); color:var(--green); font-weight:700; }
+.pick.l { background:rgba(255,71,87,.08); color:var(--red); text-decoration:line-through; opacity:.5; }
+.pick.p { color:var(--muted); }
+.tbl-foot { font-size:11px; color:var(--muted); padding:8px 12px; font-style:italic; }
+
+/* Bracket View */
+#bracketWrap { display:none; }
+#bracketWrap.show { display:block; }
+.bracket-regions { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+@media(max-width:900px) { .bracket-regions { grid-template-columns:1fr; } }
+.region-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:16px; overflow-x:auto; }
+.region-title { font-size:14px; font-weight:800; color:var(--accent); text-transform:uppercase; letter-spacing:1px; margin-bottom:12px; text-align:center; }
+.bracket-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; align-items:start; }
+.brk-round-hd { text-align:center; font-size:10px; color:var(--muted); font-weight:700; text-transform:uppercase; letter-spacing:.5px; margin-bottom:4px; }
+.brk-game { background:var(--card2); border:1px solid var(--border); border-radius:8px; margin-bottom:6px; overflow:hidden; }
+.brk-team { display:flex; align-items:center; padding:5px 8px; gap:6px; font-size:11px; border-bottom:1px solid rgba(255,255,255,.05); }
+.brk-team:last-child { border-bottom:none; }
+.brk-seed { color:var(--accent); font-weight:800; font-size:10px; min-width:16px; text-align:right; }
+.brk-name { flex:1; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.brk-team.win { background:rgba(0,210,106,.1); }
+.brk-team.win .brk-name { color:var(--green); font-weight:800; }
+.brk-team.lose .brk-name { color:var(--red); opacity:.4; text-decoration:line-through; }
+.brk-team.pending .brk-name { color:var(--muted); }
+.brk-ff { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-top:20px; }
+.ff-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:16px; text-align:center; }
+.ff-title { font-size:14px; font-weight:800; color:var(--accent); letter-spacing:1px; margin-bottom:10px; }
+
+/* Admin */
+.admin-toggle { background:var(--card2); border:1px solid var(--border); padding:8px 16px; border-radius:8px; color:var(--accent); cursor:pointer; font-size:12px; font-weight:600; font-family:inherit; margin-bottom:10px; }
+.admin-panel { background:var(--card); border:1px solid var(--accent); border-radius:12px; padding:20px; margin-bottom:16px; display:none; }
+.admin-panel.show { display:block; }
+.admin-panel h3 { color:var(--accent); margin-bottom:10px; font-size:15px; }
+.seed-section { margin-bottom:12px; }
+.seed-section h4 { color:var(--accent2); font-size:13px; margin-bottom:6px; }
+.seed-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:6px; }
+.team-btn { display:flex; align-items:center; gap:6px; padding:7px 10px; border-radius:6px; border:1px solid var(--border); background:var(--card2); cursor:pointer; font-size:12px; color:var(--text); transition:all .15s; font-family:inherit; }
+.team-btn:hover { border-color:var(--accent); }
+.team-btn.won { background:#14532d; border-color:var(--green); }
+.team-btn.lost { background:#4c0519; border-color:var(--red); opacity:.5; }
+.team-btn .sn { background:var(--accent); color:#000; border-radius:4px; padding:1px 5px; font-weight:800; font-size:10px; min-width:20px; text-align:center; }
+.admin-btns { display:flex; gap:8px; margin-top:12px; }
+.admin-btns button { padding:7px 14px; border-radius:6px; border:none; cursor:pointer; font-weight:700; font-size:12px; font-family:inherit; }
+.btn-copy { background:var(--green); color:#fff; }
+.btn-import { background:var(--accent2); color:#fff; }
+
+/* Footer */
+.footer { text-align:center; padding:20px; border-top:1px solid var(--border); margin-top:20px; }
+.footer .dev { font-size:12px; color:var(--muted); margin-bottom:8px; }
+.venmo-btn { display:inline-flex; align-items:center; gap:6px; background:linear-gradient(135deg, #3d95ce, #0074de); color:#fff; padding:10px 24px; border-radius:50px; text-decoration:none; font-weight:700; font-size:13px; transition:all .2s; border:none; cursor:pointer; }
+.venmo-btn:hover { transform:translateY(-2px); box-shadow:0 4px 15px rgba(0,116,222,.4); }
+
+/* Responsive */
+@media(max-width:768px) {
+  .main { padding:8px; }
+  .stats { grid-template-columns:repeat(2,1fr); }
+  .tier-btn { padding:8px 16px; font-size:12px; }
+  .search { width:100%; }
+  .payout-grid { grid-template-columns:1fr; }
+}
+@media print {
+  body { background:#fff; color:#000; }
+  .admin-toggle,.admin-panel,.controls,.payouts-toggle,.payouts-panel,.footer { display:none !important; }
+  .hero { background:#fff; border-color:#000; }
+  .hero h1,.hero h1 .gold { color:#000; }
+}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-tip"><a href="https://venmo.com/u/Patrick-Lentz" target="_blank" class="venmo-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M19.5 1.5c.9 1.5 1.3 3 1.3 5 0 6.2-5.3 14.3-9.6 20h-7L1.5 2.4l6.1-.6 1.8 14.5C11.6 12.2 13.5 7 13.5 4.5c0-1.8-.3-3-.8-4l6.8 1z"/></svg> Tip Dev</a></div>
+  <h1>🏀 24th Annual <span class="gold">Big Daddy</span> Seed Pool</h1>
+  <div class="year">MARCH MADNESS 2026</div>
+  <div class="updated">Last updated: <span id="ts"></span></div>
+</div>
+
+<div class="tier-bar" id="tierBar"></div>
+
+<div class="main">
+  <div class="stats" id="stats"></div>
+
+  <button class="payouts-toggle" id="payoutsToggle" onclick="togglePayouts()">💰 View Payout Structure ▾</button>
+  <div class="payouts-panel" id="payoutsPanel"></div>
+
+  <button class="admin-toggle" onclick="toggleAdmin()">⚙️ Admin: Update Results</button>
+  <div class="admin-panel" id="adminPanel"></div>
+
+  <div class="sec-head">
+    <div class="sec-title"><span class="bar"></span>Leaderboard</div>
+    <div class="controls">
+      <input type="text" class="search" id="search" placeholder="🔍 Search entries..." oninput="renderTable()">
+      <div class="view-btns" id="viewBtns">
+        <button class="active" onclick="setView('board',this)">Rankings</button>
+        <button onclick="setView('picks',this)">All Picks</button>
+        <button onclick="setView('bracket',this)">Bracket</button>
+      </div>
+    </div>
+  </div>
+  <div class="tbl-wrap"><table id="tbl"></table></div>
+  <div id="bracketWrap"></div>
+</div>
+
+<div class="footer">
+  <div class="dev">Built with 🤖 by Claude AI • Scores update every 15 min</div>
+</div>
+
+<script>
+// ============ POOL DATA ============
+const POOL_DATA = {
+  "50": [
+    {name:"3dogsonarug",picks:{"1": "Duke", "2": "Purdue", "3": "Illinois", "4": "Alabama", "5": "St Johns", "6": "Tennessee", "7": "UCLA", "8": "Georgia", "9": "Iowa", "10": "Missouri", "11": "VCU", "12": "McNeese", "13": "Hawaii", "14": "Kennesaw St", "15": "Furman", "16": "Prairie View AM"}},
+    {name:"AMSB1",picks:{"1": "Arizona", "2": "Houston", "3": "Gonzaga", "4": "Arkansas", "5": "St Johns", "6": "Tennessee", "7": "UCLA", "8": "Ohio State", "9": "Iowa", "10": "Missouri", "11": "VCU", "12": "Akron", "13": "Hofstra", "14": "North Dakota State", "15": "Furman", "16": "Howard"}},
+    {name:"AMSB2",picks:{"1": "Duke", "2": "Iowa State", "3": "Illinois", "4": "Arkansas", "5": "Vanderbilt", "6": "Tennessee", "7": "UCLA", "8": "Georgia", "9": "Utah State", "10": "Missouri", "11": "Texas", "12": "Northern Iowa", "13": "California Baptist", "14": "Kennesaw St", "15": "Furman", "16": "LIU"}},
+    {name:"AMSB3",picks:{"1": "Michigan", "2": "Houston", "3": "Gonzaga", "4": "Kansas", "5": "Vanderbilt", "6": "North Carolina", "7": "Kentucky", "8": "Ohio State", "9": "Utah State", "10": "Missouri", "11": "South Florida", "12": "High Point", "13": "Hofstra", "14": "Wright State", "15": "Furman", "16": "Prairie View AM"}},
+    {name:"AMSB4",picks:{"1": "Arizona", "2": "Houston", "3": "Gonzaga", "4": "Arkansas", "5": "St Johns", "6": "Tennessee", "7": "UCLA", "8": "Clemson", "9": "Saint Louis", "10": "Missouri", "11": "South Florida", "12": "McNeese", "13": "Hofstra", "14": "U Penn", "15": "Tennessee State", "16": "Siena"}},
+    {name:"AMSB5",picks:{"1": "Florida", "2": "Purdue", "3": "Michigan St", "4": "Nebraska", "5": "Wisconsin", "6": "BYU", "7": "Saint Mary's", "8": "Villanova", "9": "TCU", "10": "UCF", "11": "Miami OH", "12": "Akron", "13": "Hawaii", "14": "U Penn", "15": "Tennessee State", "16": "Howard"}},
+    {name:"Annibal24",picks:{"1": "Duke", "2": "Houston", "3": "Gonzaga", "4": "Nebraska", "5": "St Johns", "6": "Tennessee", "7": "Miami FL", "8": "Villanova", "9": "Iowa", "10": "Santa Clara", "11": "South Florida", "12": "Akron", "13": "Hawaii", "14": "U Penn", "15": "Furman", "16": "LIU"}},
+    {name:"B Brothers",picks:{"1": "Duke", "2": "Iowa State", "3": "Illinois", "4": "Arkansas", "5": "Vanderbilt", "6": "BYU", "7": "Miami FL", "8": "Ohio State", "9": "Utah State", "10": "Texas AM", "11": "Texas", "12": "Northern Iowa", "13": "Hofstra", "14": "U Penn", "15": "Queens", "16": "Siena"}},
+    {name:"B pags",picks:{"1": "Arizona", "2": "Iowa State", "3": "Gonzaga", "4": "Alabama", "5": "St Johns", "6": "Louisville", "7": "Saint Mary's", "8": "Ohio State", "9": "Iowa", "10": "Texas AM", "11": "VCU", "12": "Northern Iowa", "13": "Hofstra", "14": "North Dakota State", "15": "Tennessee State", "16": "Siena"}},
+    {name:"Bear Down Bay-Be!!!",picks:{"1": "Arizona", "2": "Houston", "3": "Virginia", "4": "Alabama", "5": "St Johns", "6": "North Carolina", "7": "Miami FL", "8": "Clemson", "9": "Saint Louis", "10": "UCF", "11": "Texas", "12": "High Point", "13": "Hofstra", "14": "Kennesaw St", "15": "Queens", "16": "Howard"}},
+    {name:"Bear Down Bay-Be!!! 2",picks:{"1": "Arizona", "2": "Iowa State", "3": "Michigan St", "4": "Kansas", "5": "Wisconsin", "6": "BYU", "7": "Saint Mary's", "8": "Ohio State", "9": "Utah State", "10": "Texas AM", "11": "VCU", "12": "McNeese", "13": "Hawaii", "14": "U Penn", "15": "Furman", "16": "Prairie View AM"}},
+    {name:"Big Al Tep",picks:{"1": "Arizona", "2": "Iowa State", "3": "Michigan St", "4": "Arkansas", "5": "St Johns", "6": "BYU", "7": "Saint Mary's", "8": "Ohio State", "9": "Utah State", "10": "Santa Clara", "11": "South Florida", "12": "Akron", "13": "Troy", "14": "Kennesaw St", "15": "Furman", "16": "Howard"}},
+    {name:"Big Cat 1",picks:{"1": "Michigan", "2": "UCONN", "3": "Gonzaga", "4": "Arkansas", "5": "Vanderbilt", "6": "North Carolina", "7": "Saint Mary's", "8": "Clemson", "9": "TCU", "10": "Santa Clara", "11": "South Florida", "12": "Akron", "13": "Hofstra", "14": "North Dakota State", "15": "Queens", "16": "Siena"}},
+    {name:"Big Cat 10",picks:{"1": "Arizona", "2": "Iowa State", "3": "Gonzaga", "4": "Kansas", "5": "Vanderbilt", "6": "Tennessee", "7": "Saint Mary's", "8": "Ohio State", "9": "Saint Louis", "10": "UCF", "11": "VCU", "12": "Northern Iowa", "13": "Hofstra", "14": "North Dakota State", "15": "Queens", "16": "Siena"}},
+    {name:"Big Cat 2",picks:{"1": "Michigan", "2": "Houston", "3": "Gonzaga", "4": "Arkansas", "5": "St Johns", "6": "Tennessee", "7": "UCLA", "8": "Clemson", "9": "Utah State", "10": "Santa Clara", "11": "South Florida", "12": "Akron", "13": "California Baptist", "14": "North Dakota State", "15": "Queens", "16": "Siena"}},
+    {name:"Big Cat 3",picks:{"1": "Michigan", "2": "UCONN", "3": "Gonzaga", "4": "Kansas", "5": "Vanderbilt", "6": "Tennessee", "7": "Saint Mary's", "8": "Clemson", "9": "Utah State", "10": "Missouri", "11": "Texas", "12": "High Point", "13": "Troy", "14": "North Dakota State", "15": "Queens", "16": "Siena"}},
+    {name:"Big Cat 4",picks:{"1": "Michigan", "2": "Houston", "3": "Gonzaga", "4": "Kansas", "5": "Wisconsin", "6": "Tennessee", "7": "UCLA", "8": "Clemson", "9": "Utah State", "10": "Texas AM", "11": "South Florida", "12": "Akron", "13": "Hofstra", "14": "North Dakota State", "15": "Queens", "16": "Siena"}},
+    {name:"Big Cat 5",picks:{"1": "Michigan", "2": "UCONN", "3": "Gonzaga", "4": "Arkansas", "5": "Vanderbilt", "6": "North Carolina", "7": "Saint Mary's", "8": "Ohio State", "9": "Iowa", "10": "Santa Clara", "11": "South Florida", "12": "Akron", "13": "Troy", "14": "North Dakota State", "15": "Queens", "16": "Siena"}},
+    {name:"Big Cat 6",picks:{"1": "Michigan", "2": "UCONN", "3": "Gonzaga", "4": "Arkansas", "5": "Vanderbilt", "6": "North Carolina", "7": "Kentucky", "8": "Clemson", "9": "TCU", "10": "Missouri", "11": "South Florida", "12": "Akron", "13": "Hofstra", "14": "North Dakota State", "15": "Queens", "16": "Siena"}},
+    {name:"Big Cat 7",picks:{"1": "Michigan", "2": "Houston", "3": "Gonzaga", "4": "Kansas", "5": "Wisconsin", "6": "Tennessee", "7": "Kentucky", "8": "Clemson", "9": "TCU", "10": "UCF", "11": "VCU", "12": "Northern Iowa", "13": "Troy", "14": "North Dakota State", "15": "Queens", "16": "Siena"}},
+    {name:"Big Cat 8",picks:{"1": "Arizona", "2": "Houston", "3": "Gonzaga", "4": "Alabama", "5": "St Johns", "6": "Tennessee", "7": "Kentucky", "8": "Ohio State", "9": "Iowa", "10": "UCF", "11": "South Florida", "12": "High Point", "13": "California Baptist", "14": "North Dakota State", "15": "Queens", "16": "Siena"}},
+    {name:"Big Cat 9",picks:{"1": "Arizona", "2": "UCONN", "3": "Virginia", "4": "Alabama", "5": "Vanderbilt", "6": "North Carolina", "7": "Miami FL", "8": "Georgia", "9": "TCU", "10": "Texas AM", "11": "Texas", "12": "High Point", "13": "California Baptist", "14": "North Dakota State", "15": "Queens", "16": "Siena"}},
+    {name:"Brian Fortman #3",picks:{"1": "Michigan", "2": "Houston", "3": "Gonzaga", "4": "Arkansas", "5": "Vanderbilt", "6": "Tennessee", "7": "UCLA", "8": "Villanova", "9": "Iowa", "10": "Santa Clara", "11": "VCU", "12": "Akron", "13": "Hofstra", "14": "U Penn", "15": "Tennessee State", "16": "LIU"}},
+    {name:"Brian Fortman #4",picks:{"1": "Michigan", "2": "Purdue", "3": "Illinois", "4": "Nebraska", "5": "St Johns", "6": "Tennessee", "7": "UCLA", "8": "Ohio State", "9": "Iowa", "10": "Santa Clara", "11": "VCU", "12": "Akron", "13": "Hawaii", "14": "Wright State", "15": "Idaho", "16": "Siena"}},
+    {name:"Brian Fortman #5",picks:{"1": "Arizona", "2": "Houston", "3": "Gonzaga", "4": "Arkansas", "5": "Vanderbilt", "6": "Tennessee", "7": "Miami FL", "8": "Ohio State", "9": "Utah State", "10": "Texas AM", "11": "South Florida", "12": "Akron", "13": "Troy", "14": "North Dakota State", "15": "Queens", "16": "Prairie View AM"}},
+    {name:"Brian Fortman 1",picks:{"1": "Michigan", "2": "Houston", "3": "Illinois", "4": "Arkansas", "5": "St Johns", "6": "Tennessee", "7": "UCLA", "8": "Clemson", "9": "Saint Louis", "10": "Missouri", "11": "VCU", "12": "Akron", "13": "California Baptist", "14": "Wright State", "15": "Furman", "16": "LIU"}},
+    {name:"Brian Fortman 2",picks:{"1": "Duke", "2": "Houston", "3": "Virginia", "4": "Arkansas", "5": "Vanderbilt", "6": "BYU", "7": "UCLA", "8": "Georgia", "9": "Utah State", "10": "Missouri", "11": "South Florida", "12": "Akron", "13": "Hofstra", "14": "North Dakota State", "15": "Tennessee State", "16": "Prairie View AM"}},
+    {name:"Brian McAllister 1",picks:{"1": "Arizona", "2": "Houston", "3": "Michigan St", "4": "Nebraska", "5": "St Johns", "6": "North Carolina", "7": "Miami FL", "8": "Georgia", "9": "TCU", "10": "Santa Clara", "11": "Texas", "12": "High Point", "13": "Hofstra", "14": "Wright State", "15": "Furman", "16": "Howard"}},
+    {name:"Brian McAllister 2",picks:{"1": "Duke", "2": "UCONN", "3": "Illinois", "4": "Arkansas", "5": "St Johns", "6": "Tennessee", "7": "Saint Mary's", "8": "Villanova", "9": "Saint Louis", "10": "UCF", "11": "Texas", "12": "McNeese", "13": "Hofstra", "14": "North Dakota State", "15": "Idaho", "16": "Howard"}},
+    {name:"Brian McAllister 3",picks:{"1": "Arizona", "2": "Purdue", "3": "Virginia", "4": "Nebraska", "5": "St Johns", "6": "BYU", "7": "Saint Mary's", "8": "Ohio State", "9": "Saint Louis", "10": "UCF", "11": "Miami OH", "12": "High Point", "13": "Hawaii", "14": "North Dakota State", "15": "Furman", "16": "Howard"}},
+    {name:"Brian McAllister 4",picks:{"1": "Duke", "2": "Purdue", "3": "Virginia", "4": "Kansas", "5": "Texas Tech", "6": "North Carolina", "7": "Saint Mary's", "8": "Villanova", "9": "TCU", "10": "Santa Clara", "11": "VCU", "12": "Akron", "13": "Hofstra", "14": "Kennesaw St", "15": "Idaho", "16": "Howard"}},
+    {name:"Brian McAllister 5",picks:{"1": "Michigan", "2": "Purdue", "3": "Illinois", "4": "Nebraska", "5": "St Johns", "6": "BYU", "7": "Saint Mary's", "8": "Ohio State", "9": "Iowa", "10": "Santa Clara", "11": "VCU", "12": "Akron", "13": "California Baptist", "14": "Wright State", "15": "Tennessee State", "16": "LIU"}},
+    {name:"Brian McAllister 6",picks:{"1": "Arizona", "2": "UCONN", "3": "Illinois", "4": "Arkansas", "5": "St Johns", "6": "Tennessee", "7": "UCLA", "8": "Villanova", "9": "TCU", "10": "Missouri", "11": "VCU", "12": "Akron", "13": "Hofstra", "14": "Wright State", "15": "Tennessee State", "16": "Prairie View AM"}},
+    {name:"Buddy 1",picks:{"1": "Duke", "2": "Houston", "3": "Michigan St", "4": "Arkansas", "5": "St Johns", "6": "Tennessee", "7": "UCLA", "8": "Georgia", "9": "TCU", "10": "Texas AM", "11": "Texas", "12": "McNeese", "13": "Hofstra", "14": "U Penn", "15": "Queens", "16": "LIU"}},
+    {name:"Buddy 2",picks:{"1": "Michigan", "2": "Houston", "3": "Illinois", "4": "Arkansas", "5": "Vanderbilt", "6": "Louisville", "7": "UCLA", "8": "Georgia", "9": "Iowa", "10": "Santa Clara", "11": "Texas", "12": "McNeese", "13": "Hofstra", "14": "Kennesaw St", "15": "Furman", "16": "LIU"}},
+    {name:"Buddy 3",picks:{"1": "Florida", "2": "Iowa State", "3": "Illinois", "4": "Arkansas", "5": "St Johns", "6": "Tennessee", "7": "UCLA", "8": "Ohio State", "9": "Iowa", "10": "Texas AM", "11": "Texas", "12": "Akron", "13": "Hofstra", "14": "U Penn", "15": "Furman", "16": "LIU"}},
+    {name:"Buddy 4",picks:{"1": "Duke", "2": "Houston", "3": "Michigan St", "4": "Nebraska", "5": "Vanderbilt", "6": "Tennessee", "7": "UCLA", "8": "Georgia", "9": "TCU", "10": "Missouri", "11": "Texas", "12": "McNeese", "13": "Hofstra", "14": "U Penn", "15": "Furman", "16": "LIU"}},
+    {name:"Buddy 5",picks:{"1": "Duke", "2": "Houston", "3": "Michigan St", "4": "Arkansas", "5": "St Johns", "6": "Tennessee", "7": "UCLA", "8": "Ohio State", "9": "Iowa", "10": "Texas AM", "11": "Texas", "12": "McNeese", "13": "Hofstra", "14": "U Penn", "15": "Furman", "16": "LIU"}},
+    {name:"C and S",picks:{"1": "Michigan", "2": "Houston", "3": "Michigan St", "4": "Kansas", "5": "Wisconsin", "6": "BYU", "7": "UCLA", "8": "Clemson", "9": "TCU", "10": "Texas AM", "11": "South Florida", "12": "McNeese", "13": "Hofstra", "14": "U Penn", "15": "Tennessee State", "16": "Prairie View AM"}},
+    {name:"CAlba3",picks:{"1": "Michigan", "2": "Houston", "3": "Michigan St", "4": "Arkansas", "5": "St Johns", "6": "Tennessee", "7": "Miami FL", "8": "Ohio State", "9": "Iowa", "10": "Santa Clara", "11": "South Florida", "12": "High Point", "13": "Hofstra", "14": "Wright State", "15": "Queens", "16": "Siena"}},
+    {name:"CBV",picks:{"1": "Arizona", "2": "UCONN", "3": "Gonzaga", "4": "Arkansas", "5": "Texas Tech", "6": "Tennessee", "7": "Kentucky", "8": "Georgia", "9": "Utah State", "10": "Texas AM", "11": "South Florida", "12": "High Point", "13": "Hofstra", "14": "U Penn", "15": "Queens", "16": "Howard"}},
+    {name:"Chaz -4",picks:{"1": "Arizona", "2": "Iowa State", "3": "Gonzaga", "4": "Kansas", "5": "Wisconsin", "6": "Louisville", "7": "Miami FL", "8": "Clemson", "9": "Saint Louis", "10": "Santa Clara", "11": "Texas", "12": "Northern Iowa", "13": "Hofstra", "14": "Wright State", "15": "Furman", "16": "Howard"}},
+    {name:"Chaz-2",picks:{"1": "Duke", "2": "Houston", "3": "Virginia", "4": "Arkansas", "5": "Vanderbilt", "6": "BYU", "7": "UCLA", "8": "Georgia", "9": "Utah State", "10": "Texas AM", "11": "South Florida", "12": "Akron", "13": "Hawaii", "14": "Wright State", "15": "Idaho", "16": "Siena"}},
+    {name:"Chaz-3",picks:{"1": "Arizona", "2": "Iowa State", "3": "Illinois", "4": "Arkansas", "5": "St Johns", "6": "BYU", "7": "Kentucky", "8": "Georgia", "9": "Saint Louis", "10": "UCF", "11": "South Florida", "12": "High Point", "13": "Hofstra", "14": "U Penn", "15": "Queens", "16": "Howard"}},
+    {name:"Chaz-5",picks:{"1": "Michigan", "2": "Iowa State", "3": "Michigan St", "4": "Alabama", "5": "Vanderbilt", "6": "Louisville", "7": "Kentucky", "8": "Clemson", "9": "Iowa", "10": "Santa Clara", "11": "Miami OH", "12": "High Point", "13": "California Baptist", "14": "Kennesaw St", "15": "Furman", "16": "Howard"}},
+    {name:"Chaz1",picks:{"1": "Duke", "2": "Houston", "3": "Virginia", "4": "Arkansas", "5": "St Johns", "6": "BYU", "7": "UCLA", "8": "Georgia", "9": "Utah State", "10": "Missouri", "11": "South Florida", "12": "Akron", "13": "Hofstra", "14": "U Penn", "15": "Furman", "16": "Siena"}},
+    {name:"Chick Goetz",picks:{"1": "Duke", "2": "Houston", "3": "Illinois", "4": "Arkansas", "5": "St Johns", "6": "Tennessee", "7": "Kentucky", "8": "Clemson", "9": "Iowa", "10": "Missouri", "11": "VCU", "12": "High Point", "13": "Hofstra", "14": "Wright State", "15": "Idaho", "16": "LIU"}},
+    {name:"Clivus Multrum 1",picks:{"1": "Arizona", "2": "Iowa State", "3": "Illinois", "4": "Kansas", "5": "Vanderbilt", "6": "BYU", "7": "UCLA", "8": "Georgia", "9": "Iowa", "10": "Santa Clara", "11": "South Florida", "12": "Akron", "13": "Hofstra", "14": "Kennesaw St", "15": "Idaho", "16": "Prairie View AM"}},
+    {name:"Clivus Multrum 2",picks:{"1": "Duke", "2": "Purdue", "3": "Virginia", "4": "Alabama", "5": "Vanderbilt", "6": "BYU", "7": "UCLA", "8": "Georgia", "9": "Iowa", "10": "Santa Clara", "11": "South Florida", "12": "High Point", "13": "Hofstra", "14": "Kennesaw St", "15": "Idaho", "16": "Prairie View AM"}},
+    {name:"Clivus Multrum 3",picks:{"1": "Michigan", "2": "Purdue", "3": "Illinois", "4": "Kansas", "5": "Vanderbilt", "6": "Tennessee", "7": "UCLA", "8": "Villanova", "9": "TCU", "10": "Santa Clara", "11": "Texas", "12": "High Point", "13": "Hofstra", "14": "Kennesaw St", "15": "Idaho", "16": "Prairie View AM"}},
+    {name:"Clivus Multrum 4",picks:{"1": "Arizona", "2": "Houston", "3": "Michigan St", "4": "Alabama", "5": "Vanderbilt", "6": "BYU", "7": "UCLA", "8": "Georgia", "9": "Iowa", "10": "Missouri", "11": "VCU", "12": "High Point", "13": "Hofstra", "14": "Kennesaw St", "15": "Idaho", "16": "Prairie View AM"}},
+    {name:"Clivus Multrum 5",picks:{"1": "Michigan", "2": "Iowa State", "3": "Illinois", "4": "Arkansas", "5": "Vanderbilt", "6": "BYU", "7": "UCLA", "8": "Georgia", "9": "Iowa", "10": "Santa Clara", "11": "VCU", "12": "High Point", "13": "Hofstra", "14": "Kennesaw St", "15": "Idaho", "16": "Prairie View AM"}},
+    {name:"CNOTE1",picks:{"1": "Arizona", "2": "Houston", "3": "Michigan St", "4": "Arkansas", "5": "St Johns", "6": "Tennessee", "7": "UCLA", "8": "Georgia", "9": "Iowa", "10": "Missouri", "11": "Texas", "12": "Akron", "13": "Hofstra", "14": "Kennesaw St", "15": "Furman", "16": "Howard"}},
+    {name:"CNOTE2",picks:{"1": "Duke", "2": "Iowa State", "3": "Gonzaga", "4": "Kansas", "5": "Vanderbilt", "6": "Louisville", "7": "Saint Mary's", "8": "Georgia", "9": "Utah State", "10": "Texas AM", "11": "VCU", "12": "Akron", "13": "Hofstra", "14": "North Dakota State", "15": "Idaho", "16": "Prairie View AM"}},
+    {name:"CNOTE3",picks:{"1": "Florida", "2": "Purdue", "3": "Illinois", "4": "Alabama", "5": "Wisconsin", "6": "Tennessee", "7": "Saint Mary's", "8": "Ohio State", "9": "TCU", "10": "Santa Clara", "11": "South Florida", "12": "Northern Iowa", "13": "Troy", "14": "North Dakota State", "15": "Tennessee State", "16": "Siena"}},
+    {name:"CNOTE4",picks:{"1": "Michigan", "2": "Houston", "3": "Michigan St", "4": "Arkansas", "5": "Vanderbilt", "6": "BYU", "7": "UCLA", "8": "Ohio State", "9": "Iowa", "10": "Missouri", "11": "Miami OH", "12": "Akron", "13": "California Baptist", "14": "Wright State", "15": "Furman", "16": "LIU"}},
+    {name:"CNOTE5",picks:{"1": "Duke", "2": "Purdue", "3": "Michigan St", "4": "Kansas", "5": "St Johns", "6": "Tennessee", "7": "Kentucky", "8": "Ohio State", "9": "Utah State", "10": "Santa Clara", "11": "Texas", "12": "Akron", "13": "Hawaii", "14": "North Dakota State", "15": "Queens", "16": "Howard"}},
+    {name:"Colin McLaughlin",picks:{"1": "Duke", "2": "Iowa State", "3": "Gonzaga", "4": "Arkansas", "5": "Texas Tech", "6": "BYU", "7": "UCLA", "8": "Villanova", "9": "TCU", "10": "UCF", "11": "Miami OH", "12": "High Point", "13": "Hofstra", "14": "U Penn", "15": "Queens", "16": "LIU"}},
+    {name:"Country Club Dumpster Whore",picks:{"1": "Michigan", "2": "Houston", "3": "Virginia", "4": "Arkansas", "5": "Vanderbilt", "6": "Louisville", "7": "Miami FL", "8": "Georgia", "9": "TCU", "10": "Missouri", "11": "VCU", "12": "High Point", "13": "California Baptist", "14": "U Penn", "15": "Tennessee State", "16": "LIU"}},
+    {name:"Cusehoos",picks:{"1": "Michigan", "2": "Houston", "3": "Michigan St", "4": "Arkansas", "5": "Vanderbilt", "6": "Louisville", "7": "Kentucky", "8": "Georgia", "9": "TCU", "10": "Missouri", "11": "Texas", "12": "Akron", "13": "Hofstra", "14": "Kennesaw St", "15": "Furman", "16": "LIU"}},
+    {name:"Custodial Johnny",picks:{"1": "Michigan", "2": "UCONN", "3": "Gonzaga", "4": "Arkansas", "5": "St Johns", "6": "Louisville", "7": "Miami FL", "8": "Georgia", "9": "TCU", "10": "Texas AM", "11": "VCU", "12": "High Point", "13": "Hofstra", "14": "Kennesaw St", "15": "Furman", "16": "Prairie View AM"}},
+    {name:"CWalkdahawk",picks:{"1": "Arizona", "2": "Iowa State", "3": "Illinois", "4": "Nebraska", "5": "Texas Tech", "6": "BYU", "7": "Miami FL", "8": "Georgia", "9": "Iowa", "10": "Missouri", "11": "Miami OH", "12": "Northern Iowa", "13": "Hofstra", "14": "U Penn", "15": "Tennessee State", "16": "Howard"}},
+    {name:"DanEid",picks:{"1": "Michigan", "2": "Houston", "3": "Michigan St", "4": "Arkansas", "5": "St Johns", "6": "Tennessee", "7": "Kentucky", "8": "Clemson", "9": "Utah State", "10": "Missouri", "11": "Texas", "12": "High Point", "13": "Troy", "14": "Kennesaw St", "15": "Tennessee State", "16": "Siena"}},
+    {name:"David Perlow",picks:{"1": "Duke", "2": "Iowa State", "3": "Illinois", "4": "Arkansas", "5": "St Johns", "6": "BYU", "7": "Kentucky", "8": "Ohio State", "9": "Iowa", "10": "Missouri", "11": "Miami OH", "12": "Akron", "13": "California Baptist", "14": "Wright State", "15": "Furman", "16": "Howard"}},
+    {name:"Delilah",picks:{"1": "Arizona", "2": "Houston", "3": "Michigan St", "4": "Alabama", "5": "Vanderbilt", "6": "Tennessee", "7": "Miami FL", "8": "Ohio State", "9": "Iowa", "10": "UCF", "11": "VCU", "12": "Akron", "13": "Troy", "14": "Wright State", "15": "Furman", "16": "Prairie View AM"}},
+    {name:"Dewey #1",picks:{"1": "Michigan", "2": "Houston", "3": "Michigan St", "4": "Arkansas", "5": "St Johns", "6": "Tennessee", "7": "UCLA", "8": "Clemson", "9": "Utah State", "10": "Texas AM", "11": "Texas", "12": "McNeese", "13": "Troy", "14": "U Penn", "15": "Furman", "16": "Howard"}},
+    {name:"Dewey #2",picks:{"1": "Arizona", "2": "Iowa State", "3": "Illinois", "4": "Nebraska", "5": "Texas Tech", "6": "Tennessee", "7": "Kentucky", "8": "Ohio State", "9": "Utah State", "10": "UCF", "11": "VCU", "12": "High Point", "13": "Hawaii", "14": "Kennesaw St", "15": "Idaho", "16": "Siena"}},
+    {name:"DirkE",picks:{"1": "Arizona", "2": "Houston", "3": "Michigan St", "4": "Kansas", "5": "Vanderbilt", "6": "Tennessee", "7": "UCLA", "8": "Ohio State", "9": "Utah State", "10": "Santa Clara", "11": "VCU", "12": "Akron", "13": "Hofstra", "14": "Kennesaw St", "15": "Tennessee State", "16": "Siena"}},
+    {name:"Dk",picks:{"1": "Duke", "2": "Houston", "3": "Virginia", "4": "Arkansas", "5": "Vanderbilt", "6": "Tennessee", "7": "UCLA", "8": "Clemson", "9": "Utah State", "10": "Missouri", "11": "VCU", "12": "High Point", "13": "Hawaii", "14": "Wright State", "15": "Furman", "16": "Siena"}},
+    {name:"DocBoyd1",picks:{"1": "Arizona", "2": "Iowa State", "3": "Virginia", "4": "Arkansas", "5": "St Johns", "6": "BYU", "7": "Saint Mary's", "8": "Clemson", "9": "TCU", "10": "Missouri", "11": "South Florida", "12": "McNeese", "13": "Hofstra", "14": "North Dakota State", "15": "Queens", "16": "Howard"}},
+    {name:"DocBoyd2",picks:{"1": "Duke", "2": "Iowa State", "3": "Michigan St", "4": "Nebraska", "5": "Texas Tech", "6": "Tennessee", "7": "Miami FL", "8": "Georgia", "9": "Utah State", "10": "UCF", "11": "VCU", "12": "High Point", "13": "California Baptist", "14": "Kennesaw St", "15": "Idaho", "16": "Prairie View AM"}},
+    {name:"DocBoyd3",picks:{"1": "Arizona", "2": "Iowa State", "3": "Michigan St", "4": "Arkansas", "5": "St Johns", "6": "BYU", "7": "Saint Mary's", "8": "Georgia", "9": "Utah State", "10": "UCF", "11": "South Florida", "12": "McNeese", "13": "California Baptist", "14": "North Dakota State", "15": "Queens", "16": "Prairie View AM"}},
+    {name:"DocBoyd4",picks:{"1": "Florida", "2": "Houston", "3": "Virginia", "4": "Nebraska", "5": "Wisconsin", "6": "BYU", "7": "Miami FL", "8": "Clemson", "9": "TCU", "10": "Santa Clara", "11": "South Florida", "12": "High Point", "13": "California Baptist", "14": "U Penn", "15": "Furman", "16": "Howard"}},
+    {name:"DocBoyd5",picks:{"1": "Michigan", "2": "Iowa State", "3": "Michigan St", "4": "Nebraska", "5": "Wisconsin", "6": "BYU", "7": "Saint Mary's", "8": "Villanova", "9": "TCU", "10": "Missouri", "11": "VCU", "12": "McNeese", "13": "California Baptist", "14": "Kennesaw St", "15": "Furman", "16": "LIU"}},
+    {name:"Dr Hogan",picks:{"1": "Arizona", "2": "Houston", "3": "Michigan St", "4": "Arkansas", "5": "St Johns", "6": "Tennessee", "7": "Saint Mary's", "8": "Villanova", "9": "Saint Louis", "10": "Texas AM", "11": "Texas", "12": "Northern Iowa", "13": "Troy", "14": "Kennesaw St", "15": "Idaho", "16": "LIU"}},
+    {name:"Dr Ryder",picks:{"1": "Michigan", "2": "Houston", "3": "Michigan St", "4": "Arkansas", "5": "St Johns", "6": "BYU", "7": "Saint Mary's", "8": "Ohio State", "9": "Iowa", "10": "UCF", "11": "VCU", "12": "Akron", "13": "Hofstra", "14": "Kennesaw St", "15": "Queens", "16": "LIU"}},
+    {name:"Duck Duck 1",picks:{"1": "Arizona", "2": "Houston", "3": "Michigan St", "4": "Alabama", "5": "Vanderbilt", "6": "BYU", "7": "UCLA", "8": "Clemson", "9": "Saint Louis", "10": "Santa Clara", "11": "South Florida", "12": "High Point", "13": "California Baptist", "14": "U Penn", "15": "Queens", "16": "Howard"}},
+    {name:"Duck Duck 2",picks:{"1": "Arizona", "2": "UCONN", "3": "Virginia", "4": "Nebraska", "5": "St Johns", "6": "North Carolina", "7": "Miami FL", "8": "Georgia", "9": "Utah State", "10": "Texas AM", "11": "Miami OH", "12": "Northern Iowa", "13": "Hofstra", "14": "Kennesaw St", "15": "Idaho", "16": "Siena"}},
+    {name:"Duck Duck 3",picks:{"1": "Arizona", "2": "Houston", "3": "Michigan St", "4": "Nebraska", "5": "St Johns", "6": "BYU", "7": "Miami FL", "8": "Clemson", "9": "Saint Louis", "10": "Santa Clara", "11": "Miami OH", "12": "High Point", "13": "Troy", "14": "Kennesaw St", "15": "Tennessee State", "16": "Siena"}},
+    {name:"ECN525 1",picks:{"1": "Michigan", "2": "UCONN", "3": "Illinois", "4": "Arkansas", "5": "St Johns", "6": "Louisville", "7": "Miami FL", "8": "Clemson", "9": "Utah State", "10": "Santa Clara", "11": "Miami OH", "12": "Akron", "13": "Hawaii", "14": "Kennesaw St", "15": "Tennessee State", "16": "Siena"}},
+    {name:"ECN525 2",picks:{"1": "Arizona", "2": "Iowa State", "3": "Michigan St", "4": "Nebraska", "5": "Wisconsin", "6": "Tennessee", "7": "Saint Mary's", "8": "Ohio State", "9": "Saint Louis", "10": "Missouri", "11": "Texas", "12": "Akron", "13": "California Baptist", "14": "U Penn", "15": "Furman", "16": "Prairie View AM"}},
+    {name:"Ed Pugh",picks:{"1": "Arizona", "2": "Houston", "3": "Michigan St", "4": "Arkansas", "5": "St Johns", "6": "Tennessee", "7": "UCLA", "8": "Clemson", "9": "TCU", "10": "Missouri", "11": "VCU", "12": "Akron", "13": "Troy", "14": "Wright State", "15": "Furman", "16": "Prairie View AM"}},
+    {name:"El Hombre 01",picks:{"1": "Duke", "2": "Purdue", "3": "Illinois", "4": "Arkansas", "5": "St Johns", "6": "Louisville", "7": "Saint Mary's", "8": "Ohio State", "9": "Saint Louis", "10": "Santa Clara", "11": "Miami OH", "12": "High Point", "13": "Troy", "14": "Wright State", "15": "Furman", "16": "Howard"}},
+    {name:"El Hombre 02",picks:{"1": "Arizona", "2": "Iowa State", "3": "Michigan St", "4": "Nebraska", "5": "Wisconsin", "6": "BYU", "7": "Kentucky", "8": "Ohio State", "9": "Iowa", "10": "UCF", "11": "Miami OH", "12": "McNeese", "13": "Hawaii", "14": "Kennesaw St", "15": "Idaho", "16": "Howard"}},
+    {name:"El Hombre 03",picks:{"1": "Michigan", "2": "Houston", "3": "Gonzaga", "4": "Kansas", "5": "Vanderbilt", "6": "Tennessee", "7": "Miami FL", "8": "Clemson", "9": "TCU", "10": "Texas AM", "11": "Texas", "12": "Akron", "13": "Hawaii", "14": "Wright State", "15": "Furman", "16": "Prairie View AM"}},
+    {name:"El Hombre 04",picks:{"1": "Arizona", "2": "Houston", "3": "Michigan St", "4": "Arkansas", "5": "Texas Tech", "6": "BYU", "7": "Saint Mary's", "8": "Ohio State", "9": "Iowa", "10": "Santa Clara", "11": "Miami OH", "12": "High Point", "13": "Troy", "14": "Kennesaw St", "15": "Tennessee State", "16": "Siena"}},
+    {name:"El Hombre 05",picks:{"1": "Arizona", "2": "Iowa State", "3": "Michigan St", "4": "Arkansas", "5": "St Johns", "6": "BYU", "7": "Saint Mary's", "8": "Ohio State", "9": "Iowa", "10": "Santa Clara", "11": "Miami OH", "12": "Akron", "13": "Troy", "14": "Wright State", "15": "Furman", "16": "Howard"}},
+    {name:"Ferster1",picks:{"1": "Arizona", "2": "Iowa State", "3": "Illinois", "4": "Arkansas", "5": "Texas Tech", "6": "Louisville", "7": "Miami FL", "8": "Ohio State", "9": "Iowa", "10": "UCF", "11": "Texas", "12": "McNeese", "13": "Hofstra", "14": "Wright State", "15": "Queens", "16": "Siena"}},
+    {name:"Ferster2",picks:{"1": "Arizona", "2": "Iowa State", "3": "Illinois", "4": "Nebraska", "5": "Wisconsin", "6": "Tennessee", "7": "UCLA", "8": "Ohio State", "9": "Saint Louis", "10": "Missouri", "11": "South Florida", "12": "Northern Iowa", "13": "Hofstra", "14": "Kennesaw St", "15": "Furman", "16": "Prairie View AM"}},
+    {name:"Ferster3",picks:{"1": "Michigan", "2": "Houston", "3": "Gonzaga", "4": "Kansas", "5": "Vanderbilt", "6": "North Carolina", "7": "UCLA", "8": "Ohio State", "9": "Utah State", "10": "Santa Clara", "11": "Miami OH", "12": "High Point", "13": "Troy", "14": "North Dakota State", "15": "Queens", "16": "Prairie View AM"}},
+    {name:"Ferster4",picks:{"1": "Arizona", "2": "UCONN", "3": "Virginia", "4": "Alabama", "5": "St Johns", "6": "BYU", "7": "Kentucky", "8": "Clemson", "9": "Saint Louis", "10": "Missouri", "11": "South Florida", "12": "McNeese", "13": "Hawaii", "14": "U Penn", "15": "Idaho", "16": "Siena"}},
+    {name:"Ferster5",picks:{"1": "Duke", "2": "Purdue", "3": "Michigan St", "4": "Arkansas", "5": "St Johns", "6": "BYU", "7": "Saint Mary's", "8": "Villanova", "9": "TCU", "10": "Santa Clara", "11": "VCU", "12": "Akron", "13": "California Baptist", "14": "Wright State", "15": "Furman", "16": "Howard"}},
+    {name:"FOB",picks:{"1": "Duke", "2": "Purdue", "3": "Illinois", "4": "Alabama", "5": "St Johns", "6": "North Carolina", "7": "Kentucky", "8": "Georgia", "9": "TCU", "10": "Texas AM", "11": "Texas", "12": "High Point", "13": "California Baptist", "14": "Wright State", "15": "Tennessee State", "16": "LIU"}},
+    {name:"Foster",picks:{"1": "Florida", "2": "Iowa State", "3": "Gonzaga", "4": "Kansas", "5": "Vanderbilt", "6": "Tennessee", "7": "UCLA", "8": "Villanova", "9": "TCU", "10": "UCF", "11": "Texas", "12": "High Point", "13": "Hofstra", "14": "Wright State", "15": "Queens", "16": "LIU"}},
+    {name:"G Money 2",picks:{"1": "Michigan", "2": "Houston", "3": "Virginia", "4": "Arkansas", "5": "St Johns", "6": "BYU", "7": "UCLA", "8": "Ohio State", "9": "Iowa", "10": "Missouri", "11": "South Florida", "12": "Akron", "13": "Hofstra", "14": "Kennesaw St", "15": "Queens", "16": "Siena"}},
+    {name:"Gabby Ruffini",picks:{"1": "Arizona", "2": "Houston", "3": "Michigan St", "4": "Arkansas", "5": "Vanderbilt", "6": "BYU", "7": "UCLA", "8": "Ohio State", "9": "Iowa", "10": "Texas AM", "11": "VCU", "12": "Akron", "13": "Troy", "14": "U Penn", "15": "Furman", "16": "Prairie View AM"}},
+    {name:"Gagoots",picks:{"1": "Michigan", "2": "Purdue", "3": "Virginia", "4": "Arkansas", "5": "Wisconsin", "6": "Tennessee", "7": "UCLA", "8": "Ohio State", "9": "TCU", "10": "UCF", "11": "Texas", "12": "Akron", "13": "Troy", "14": "Kennesaw St", "15": "Tennessee State", "16": "LIU"}},
+    {name:"GannonsCalves1",picks:{"1": "Arizona", "2": "Houston", "3": "Gonzaga", "4": "Kansas", "5": "Vanderbilt", "6": "Tennessee", "7": "Miami FL", "8": "Ohio State", "9": "Iowa", "10": "Santa Clara", "11": "South Florida", "12": "Akron", "13": "Hofstra", "14": "North Dakota State", "15": "Tennessee State", "16": "Howard"}},
+    {name:"GannonsCalves2",picks:{"1": "Michigan", "2": "Houston", "3": "Virginia", "4": "Kansas", "5": "Vanderbilt", "6": "Tennessee", "7": "UCLA", "8": "Clemson", "9": "Iowa", "10": "Santa Clara", "11": "South Florida", "12": "Akron", "13": "Troy", "14": "U Penn", "15": "Idaho", "16": "Howard"}},
+    {name:"GannonsCalves3",picks:{"1": "Florida", "2": "Purdue", "3": "Michigan St", "4": "Nebraska", "5": "St Johns", "6": "Tennessee", "7": "Kentucky", "8": "Villanova", "9": "Saint Louis", "10": "Missouri", "11": "Texas", "12": "McNeese", "13": "California Baptist", "14": "Wright State", "15": "Furman", "16": "LIU"}},
+    {name:"GannonsCalves4",picks:{"1": "Duke", "2": "Houston", "3": "Virginia", "4": "Arkansas", "5": "Vanderbilt", "6": "BYU", "7": "UCLA", "8": "Ohio State", "9": "Saint Louis", "10": "Santa Clara", "11": "VCU", "12": "Northern Iowa", "13": "Hofstra", "14": "North Dakota State", "15": "Furman", "16": "Howard"}},
+    {name:"GannonsCalves5",picks:{"1": "Arizona", "2": "UCONN", "3": "Michigan St", "4": "Alabama", "5": "St Johns", "6": "Tennessee", "7": "Saint Mary's", "8": "Villanova", "9": "Iowa", "10": "Missouri", "11": "South Florida", "12": "McNeese", "13": "Hawaii", "14": "U Penn", "15": "Idaho", "16": "Howard"}},
+    {name:"GannonsCalves6",picks:{"1": "Florida", "2": "Iowa State", "3": "Michigan St", "4": "Nebraska", "5": "Wisconsin", "6": "Tennessee", "7": "Miami FL", "8": "Georgia", "9": "Iowa", "10": "Texas AM", "11": "VCU", "12": "McNeese", "13": "Hofstra", "14": "Kennesaw St", "15": "Idaho", "16": "Howard"}},
+    {name:"GB1",picks:{"1": "Florida", "2": "Iowa State", "3": "Michigan St", "4": "Alabama", "5": "St Johns", "6": "Tennessee", "7": "UCLA", "8": "Georgia", "9": "Utah State", "10": "Santa Clara", "11": "South Florida", "12": "Akron", "13": "Hawaii", "14": "U Penn", "15": "Furman", "16": "Howard"}},
+    {name:"GB2",picks:{"1": "Duke", "2": "Purdue", "3": "Virginia", "4": "Arkansas", "5": "Vanderbilt", "6": "Tennessee", "7": "UCLA", "8": "Georgia", "9": "Iowa", "10": "Texas AM", "11": "VCU", "12": "Akron", "13": "Troy", "14": "Kennesaw St", "15": "Idaho", "16": "LIU"}},
+    {name:"GB3",picks:{"1": "Arizona", "2": "Iowa State", "3": "Michigan St", "4": "Kansas", "5": "Vanderbilt", "6": "Tennessee", "7": "Saint Mary's", "8": "Ohio State", "9": "Utah State", "10": "Missouri", "11": "VCU", "12": "Northern Iowa", "13": "Troy", "14": "Wright State", "15": "Queens", "16": "Siena"}},
+    {name:"GB4",picks:{"1": "Florida", "2": "Purdue", "3": "Michigan St", "4": "Arkansas", "5": "Texas Tech", "6": "Tennessee", "7": "UCLA", "8": "Georgia", "9": "TCU", "10": "Santa Clara", "11": "Texas", "12": "High Point", "13": "Hofstra", "14": "Kennesaw St", "15": "Tennessee State", "16": "Howard"}},
+    {name:"GB5",picks:{"1": "Arizona", "2": "Houston", "3": "Gonzaga", "4": "Kansas", "5": "Vanderbilt", "6": "Tennessee", "7": "Saint Mary's", "8": "Georgia", "9": "Iowa", "10": "Missouri", "11": "South Florida", "12": "Northern Iowa", "13": "Hawaii", "14": "North Dakota State", "15": "Furman", "16": "Prairie View AM"}},
+    {name:"Gdeets",picks:{"1": "Arizona", "2": "Houston", "3": "Michigan St", "4": "Arkansas", "5": "Vanderbilt", "6": "BYU", "7": "Saint Mary's", "8": "Ohio State", "9": "Saint Louis", "10": "Santa Clara", "11": "VCU", "12": "Northern Iowa", "13": "Hofstra", "14": "Wright State", "15": "Furman", "16": "Siena"}},
+    {name:"Giachetti 1",picks:{"1": "Duke", "2": "Iowa State", "3": "Illinois", "4": "Arkansas", "5": "Vanderbilt", "6": "BYU", "7": "UCLA", "8": "Clemson", "9": "Saint Louis", "10": "Santa Clara", "11": "South Florida", "12": "Akron", "13": "California Baptist", "14": "Wright State", "15": "Queens", "16": "Prairie View AM"}},
+    {name:"Giachetti 2",picks:{"1": "Arizona", "2": "Houston", "3": "Michigan St", "4": "Alabama", "5": "St Johns", "6": "Tennessee", "7": "UCLA", "8": "Georgia", "9": "Iowa", "10": "Santa Clara", "11": "Texas", "12": "High Point", "13": "Hawaii", "14": "U Penn", "15": "Furman", "16": "Siena"}},
+    {name:"Giachetti 3",picks:{"1": "Florida", "2": "Purdue", "3": "Virginia", "4": "Kansas", "5": "Wisconsin", "6": "North Carolina", "7": "UCLA", "8": "Georgia", "9": "TCU", "10": "Texas AM", "11": "South Florida", "12": "Akron", "13": "Hofstra", "14": "Kennesaw St", "15": "Idaho", "16": "LIU"}},
+    {name:"Giachetti 4",picks:{"1": "Michigan", "2": "UCONN", "3": "Gonzaga", "4": "Nebraska", "5": "St Johns", "6": "Tennessee", "7": "Saint Mary's", "8": "Ohio State", "9": "Utah State", "10": "Santa Clara", "11": "VCU", "12": "High Point", "13": "Hofstra", "14": "North Dakota State", "15": "Tennessee State", "16": "Prairie View AM"}},
+    {name:"Giachetti 5",picks:{"1": "Florida", "2": "UCONN", "3": "Virginia", "4": "Arkansas", "5": "Texas Tech", "6": "BYU", "7": "Saint Mary's", "8": "Villanova", "9": "TCU", "10": "Missouri", "11": "VCU", "12": "McNeese", "13": "California Baptist", "14": "Kennesaw St", "15": "Queens", "16": "Howard"}},
+    {name:"GMoney 1",picks:{"1": "Michigan", "2": "Houston", "3": "Gonzaga", "4": "Arkansas", "5": "Vanderbilt", "6": "BYU", "7": "Kentucky", "8": "Ohio State", "9": "Iowa", "10": "Missouri", "11": "Miami OH", "12": "High Point", "13": "Hofstra", "14": "North Dakota State", "15": "Furman", "16": "Siena"}},
+    {name:"GOT",picks:{"1": "Arizona", "2": "UCONN", "3": "Illinois", "4": "Alabama", "5": "Vanderbilt", "6": "Louisville", "7": "Miami FL", "8": "Clemson", "9": "TCU", "10": "Missouri", "11": "Texas", "12": "High Point", "13": "Hofstra", "14": "Wright State", "15": "Tennessee State", "16": "LIU"}},
+    {name:"Greenough1",picks:{"1": "Michigan", "2": "Purdue", "3": "Illinois", "4": "Arkansas", "5": "St Johns", "6": "Louisville", "7": "Saint Mary's", "8": "Ohio State", "9": "Iowa", "10": "Santa Clara", "11": "Texas", "12": "Akron", "13": "Troy", "14": "U Penn", "15": "Tennessee State", "16": "Howard"}},
+    {name:"Greenough2",picks:{"1": "Arizona", "2": "Houston", "3": "Michigan St", "4": "Arkansas", "5": "Vanderbilt", "6": "North Carolina", "7": "UCLA", "8": "Georgia", "9": "TCU", "10": "Missouri", "11": "Miami OH", "12": "High Point", "13": "Hofstra", "14": "Wright State", "15": "Furman", "16": "LIU"}},
+    {name:"grossi (kristen)",picks:{"1": "Arizona", "2": "Houston", "3": "Virginia", "4": "Arkansas", "5": "St Johns", "6": "BYU", "7": "UCLA", "8": "Georgia", "9": "Iowa", "10": "Santa Clara", "11": "South Florida", "12": "McNeese", "13": "Hofstra", "14": "U Penn", "15": "Furman", "16": "Siena"}},
+    {name:"grossi (matthew)",picks:{"1": "Michigan", "2": "Houston", "3": "Michigan St", "4": "Arkansas", "5": "St Johns", "6": "BYU", "7": "Kentucky", "8": "Clemson", "9": "Utah State", "10": "Missouri", "11": "VCU", "12": "Akron", "13": "Troy", "14": "U Penn", "15": "Furman", "16": "LIU"}},
+    {name:"grossi (watkins)",picks:{"1": "Arizona", "2": "Houston", "3": "Michigan St", "4": "Arkansas", "5": "St Johns", "6": "BYU", "7": "Kentucky", "8": "Ohio State", "9": "TCU", "10": "UCF", "11": "Miami OH", "12": "Akron", "13": "Hofstra", "14": "U Penn", "15": "Tennessee State", "16": "Howard"}},
+    {name:"grossi 1",picks:{"1": "Michigan", "2": "Houston", "3": "Virginia", "4": "Kansas", "5": "Wisconsin", "6": "BYU", "7": "UCLA", "8": "Clemson", "9": "Utah State", "10": "Santa Clara", "11": "VCU", "12": "Akron", "13": "Troy", "14": "U Penn", "15": "Tennessee State", "16": "LIU"}},
+    {name:"grossi 2",picks:{"1": "Arizona", "2": "Iowa State", "3": "Illinois", "4": "Arkansas", "5": "St Johns", "6": "Tennessee", "7": "Miami FL", "8": "Ohio State", "9": "Iowa", "10": "Texas AM", "11": "South Florida", "12": "High Point", "13": "Troy", "14": "Wright State", "15": "Furman", "16": "Siena"}},
+    {name:"Gutbuster",picks:{"1": "Duke", "2": "UCONN", "3": "Michigan St", "4": "Arkansas", "5": "St Johns", "6": "Tennessee", "7": "UCLA", "8": "Ohio State", "9": "Utah State", "10": "Missouri", "11": "Texas", "12": "High Point", "13": "Hofstra", "14": "Kennesaw St", "15": "Queens", "16": "Howard"}},
+    {name:"Gutbuster2",picks:{"1": "Arizona", "2": "Houston", "3": "Illinois", "4": "Alabama", "5": "Wisconsin", "6": "North Carolina", "7": "Miami FL", "8": "Clemson", "9": "Iowa", "10": "UCF", "11": "South Florida", "12": "McNeese", "13": "Troy", "14": "U Penn", "15": "Queens", "16": "Prairie View AM"}},
+    {name:"Gutbuster3",picks:{"1": "Duke", "2": "Iowa State", "3": "Michigan St", "4": "Kansas", "5": "Texas Tech", "6": "North Carolina", "7": "Saint Mary's", "8": "Georgia", "9": "Utah State", "10": "Missouri", "11": "Texas", "12": "Northern Iowa", "13": "Hofstra", "14": "Kennesaw St", "15": "Tennessee State", "16": "Prairie View AM"}},
+    {name:"Gutbuster4",picks:{"1": "Arizona", "2": "Houston", "3": "Virginia", "4": "Arkansas", "5": "Vanderbilt", "6": "BYU", "7": "UCLA", "8": "Ohio State", "9": "Utah State", "10": "UCF", "11": "South Florida", "12": "McNeese", "13": "Troy", "14": "Kennesaw St", "15": "Queens", "16": "Howard"}},
+    {name:"Gutbuster5",picks:{"1": "Florida", "2": "Purdue", "3": "Gonzaga", "4": "Alabama", "5": "Wisconsin", "6": "North Carolina", "7": "Miami FL", "8": "Villanova", "9": "Utah State", "10": "Texas AM", "11": "Texas", "12": "High Point", "13": "Hofstra", "14": "Wright State", "15": "Furman", "16": "LIU"}},
+    {name:"Ham Daddy",picks:{"1": "Michigan", "2": "Purdue", "3": "Michigan St", "4": "Arkansas", "5": "Vanderbilt", "6": "Tennessee", "7": "UCLA", "8": "Clemson", "9": "TCU", "10": "Missouri", "11": "VCU", "12": "Akron", "13": "Troy", "14": "U Penn", "15": "Furman", "16": "Howard"}},
+    {name:"Harvs 1",picks:{"1": "Michigan", "2": "Purdue", "3": "Illinois", "4": "Kansas", "5": "St Johns", "6": "Tennessee", "7": "UCLA", "8": "Ohio State", "9": "Utah State", "10": "UCF", "11": "VCU", "12": "McNeese", "13": "Troy", "14": "North Dakota State", "15": "Tennessee State", "16": "Howard"}},
+    {name:"Harvs 2",picks:{"1": "Duke", "2": "Purdue", "3": "Illinois", "4": "Alabama", "5": "St Johns", "6": "BYU", "7": "Miami FL", "8": "Villanova", "9": "Iowa", "10": "Texas AM", "11": "Texas", "12": "Akron", "13": "California Baptist", "14": "Wright State", "15": "Furman", "16": "LIU"}},
+    {name:"Harvs 3",picks:{"1": "Arizona", "2": "Iowa State", "3": "Gonzaga", "4": "Nebraska", "5": "Texas Tech", "6": "North Carolina", "7": "Saint Mary's", "8": "Ohio State", "9": "Saint Louis", "10": "Santa Clara", "11": "Miami OH", "12": "High Point", "13": "Hawaii", "14": "Wright State", "15": "Queens", "16": "Howard"}},
+    {name:"Harvs 4",picks:{"1": "Duke", "2": "Houston", "3": "Illinois", "4": "Nebraska", "5": "Vanderbilt", "6": "Tennessee", "7": "Saint Mary's", "8": "Ohio State", "9": "Utah State", "10": "Santa Clara", "11": "Texas", "12": "Akron", "13": "Hofstra", "14": "North Dakota State", "15": "Idaho", "16": "Howard"}},
+    {name:"Harvs 5",picks:{"1": "Florida", "2": "Iowa State", "3": "Michigan St", "4": "Arkansas", "5": "St Johns", "6": "North Carolina", "7": "Miami FL", "8": "Georgia", "9": "TCU", "10": "Santa Clara", "11": "South Florida", "12": "Akron", "13": "Hofstra", "14": "U Penn", "15": "Furman", "16": "Siena"}},
+    {name:"HENGEN",picks:{"1": "Arizona", "2": "UCONN", "3": "Michigan St", "4": "Kansas", "5": "St Johns", "6": "North Carolina", "7": "Kentucky", "8": "Clemson", "9": "Saint Louis", "10": "UCF", "11": "Texas", "12": "High Point", "13": "Hofstra", "14": "North Dakota State", "15": "Tennessee State", "16": "Siena"}},
+    {name:"Hild Bros 1",picks:{"1": "Florida", "2": "UCONN", "3": "Virginia", "4": "Arkansas", "5": "Vanderbilt", "6": "Louisville", "7": "Kentucky", "8": "Villanova", "9": "TCU", "10": "Texas AM", "11": "Texas", "12": "High Point", "13": "California Baptist", "14": "U Penn", "15": "Furman", "16": "LIU"}},
+    {name:"Hild Bros 2",picks:{"1": "Arizona", "2": "Iowa State", "3": "Gonzaga", "4": "Kansas", "5": "St Johns", "6": "BYU", "7": "Kentucky", "8": "Clemson", "9": "Saint Louis", "10": "UCF", "11": "VCU", "12": "High Point", "13": "Hofstra", "14": "North Dakota State", "15": "Queens", "16": "Liu"}},
+    {name:"JannaChuk",picks:{"1": "Arizona", "2": "Houston", "3": "Illinois", "4": "Alabama", "5": "Vanderbilt", "6": "BYU", "7": "UCLA", "8": "Georgia", "9": "TCU", "10": "Missouri", "11": "South Florida", "12": "Akron", "13": "Hofstra", "14": "North Dakota State", "15": "Tennessee State", "16": "Prairie View AM"}},
+    {name:"JAR46",picks:{"1": "Arizona", "2": "Houston", "3": "Michigan St", "4": "Arkansas", "5": "Vanderbilt", "6": "BYU", "7": "UCLA", "8": "Georgia", "9": "TCU", "10": "Missouri", "11": "South Florida", "12": "Akron", "13": "Hofstra", "14": "Wright State", "15": "Furman", "16": "Siena"}},
+    {name:"JCarr",picks:{"1": "Duke", "2": "Houston", "3": "Virginia", "4": "Kansas", "5": "Texas Tech", "6": "Tennessee", "7": "UCLA", "8": "Villanova", "9": "Iowa", "10": "Santa Clara", "11": "South Florida", "12": "High Point", "13": "Troy", "14": "North Dakota State", "15": "Furman", "16": "Prairie View AM"}},
+    {name:"Jesse oneill",picks:{"1": "Arizona", "2": "Iowa State", "3": "Michigan St", "4": "Arkansas", "5": "St Johns", "6": "Tennessee", "7": "Saint Mary's", "8": "Clemson", "9": "Utah State", "10": "UCF", "11": "Texas", "12": "High Point", "13": "California Baptist", "14": "North Dakota State", "15": "Queens", "16": "Howard"}},
+    {name:"JFL",picks:{"1": "Michigan", "2": "Purdue", "3": "Michigan St", "4": "Arkansas", "5": "St Johns", "6": "BYU", "7": "Saint Mary's", "8": "Georgia", "9": "Iowa", "10": "Missouri", "11": "Texas", "12": "Akron", "13": "Hofstra", "14": "North Dakota State", "15": "Furman", "16": "LIU"}},
+    {name:"jim chrystal",picks:{"1": "Arizona", "2": "Iowa State", "3": "Michigan St", "4": "Arkansas", "5": "St Johns", "6": "Tennessee", "7": "Saint Mary's", "8": "Georgia", "9": "Iowa", "10": "Missouri", "11": "South Florida", "12": "Akron", "13": "Hofstra", "14": "Kennesaw St", "15": "Furman", "16": "Howard"}},
+    {name:"Jimmy Chun",picks:{"1": "Arizona", "2": "Houston", "3": "Michigan St", "4": "Arkansas", "5": "St Johns", "6": "Tennessee", "7": "UCLA", "8": "Ohio State", "9": "Saint Louis", "10": "Santa Clara", "11": "VCU", "12": "Akron", "13": "Troy", "14": "Kennesaw St", "15": "Queens", "16": "Prairie View AM"}},
+    {name:"JLOU",picks:{"1": "Arizona", "2": "Houston", "3": "Michigan St", "4": "Kansas", "5": "Vanderbilt", "6": "BYU", "7": "UCLA", "8": "Ohio State", "9": "Iowa", "10": "Santa Clara", "11": "South Florida", "12": "Akron", "13": "Troy", "14": "U Penn", "15": "Furman", "16": "Howard"}},
+    {name:"Joe Clark-1",picks:{"1": "Michigan", "2": "Iowa State", "3": "Michigan St", "4": "Nebraska", "5": "St Johns", "6": "Tennessee", "7": "UCLA", "8": "Ohio State", "9": "Iowa", "10": "Santa Clara", "11": "VCU", "12": "High Point", "13": "Hofstra", "14": "U Penn", "15": "Furman", "16": "Howard"}},
+    {name:"Joe Clark-2",picks:{"1": "Arizona", "2": "Iowa State", "3": "Virginia", "4": "Arkansas", "5": "St Johns", "6": "Tennessee", "7": "UCLA", "8": "Ohio State", "9": "Utah State", "10": "Santa Clara", "11": "South Florida", "12": "Akron", "13": "Hofstra", "14": "U Penn", "15": "Queens", "16": "Siena"}},
+    {name:"Johhny E",picks:{"1": "Arizona", "2": "Houston", "3": "Michigan St", "4": "Nebraska", "5": "Texas Tech", "6": "Louisville", "7": "UCLA", "8": "Clemson", "9": "TCU", "10": "Texas AM", "11": "VCU", "12": "High Point", "13": "Hofstra", "14": "Wright State", "15": "Queens", "16": "LIU"}},
+    {name:"John ob 1",picks:{"1": "Michigan", "2": "Purdue", "3": "Virginia", "4": "Arkansas", "5": "St Johns", "6": "BYU", "7": "UCLA", "8": "Ohio State", "9": "Utah State", "10": "Santa Clara", "11": "Miami OH", "12": "Akron", "13": "Hofstra", "14": "North Dakota State", "15": "Tennessee State", "16": "LIU"}},
+    {name:"John Obrien 2",picks:{"1": "Michigan", "2": "Houston", "3": "Illinois", "4": "Arkansas", "5": "St Johns", "6": "Tennessee", "7": "Saint Mary's", "8": "Ohio State", "9": "Utah State", "10": "Missouri", "11": "South Florida", "12": "McNeese", "13": "Hofstra", "14": "Kennesaw St", "15": "Tennessee State", "16": "Siena"}},
+    {name:"Johnny the Heat1",picks:{"1": "Michigan", "2": "Houston", "3": "Michigan St", "4": "Arkansas", "5": "Vanderbilt", "6": "Tennessee", "7": "Miami FL", "8": "Ohio State", "9": "Iowa", "10": "UCF", "11": "Miami OH", "12": "Northern Iowa", "13": "Hofstra", "14": "U Penn", "15": "Tennessee State", "16": "LIU"}},
+    {name:"Joseph Cella",picks:{"1": "Arizona", "2": "Houston", "3": "Michigan St", "4": "Arkansas", "5": "Vanderbilt", "6": "North Carolina", "7": "UCLA", "8": "Ohio State", "9": "Saint Louis", "10": "Santa Clara", "11": "Miami OH", "12": "High Point", "13": "Hofstra", "14": "North Dakota State", "15": "Queens", "16": "LIU"}},
+    {name:"JP2",picks:{"1": "Duke", "2": "Iowa State", "3": "Virginia", "4": "Alabama", "5": "Wisconsin", "6": "BYU", "7": "Miami FL", "8": "Georgia", "9": "Iowa", "10": "Santa Clara", "11": "VCU", "12": "Northern Iowa", "13": "Troy", "14": "North Dakota State", "15": "Idaho", "16": "Prairie View AM"}},
+    {name:"JP3",picks:{"1": "Arizona", "2": "Iowa State", "3": "Michigan St", "4": "Alabama", "5": "St Johns", "6": "Tennessee", "7": "Miami FL", "8": "Ohio State", "9": "Utah State", "10": "Santa Clara", "11": "VCU", "12": "Akron", "13": "Hofstra", "14": "North Dakota State", "15": "Furman", "16": "Howard"}},
+    {name:"Jrey",picks:{"1": "Michigan", "2": "Purdue", "3": "Michigan St", "4": "Nebraska", "5": "St Johns", "6": "BYU", "7": "Kentucky", "8": "Ohio State", "9": "Iowa", "10": "Texas AM", "11": "Miami OH", "12": "Akron", "13": "California Baptist", "14": "U Penn", "15": "Idaho", "16": "LIU"}},
+    {name:"Jrey #2",picks:{"1": "Michigan", "2": "Purdue", "3": "Illinois", "4": "Alabama", "5": "St Johns", "6": "BYU", "7": "UCLA", "8": "Clemson", "9": "Utah State", "10": "Texas AM", "11": "Miami OH", "12": "High Point", "13": "Troy", "14": "Kennesaw St", "15": "Furman", "16": "LIU"}},
+    {name:"katz 1",picks:{"1": "Arizona", "2": "Houston", "3": "Virginia", "4": "Nebraska", "5": "St Johns", "6": "BYU", "7": "Miami FL", "8": "Villanova", "9": "Iowa", "10": "Santa Clara", "11": "VCU", "12": "Akron", "13": "Hofstra", "14": "Kennesaw St", "15": "Furman", "16": "Prairie View AM"}},
+    {name:"katz 2",picks:{"1": "Duke", "2": "Iowa State", "3": "Illinois", "4": "Arkansas", "5": "Wisconsin", "6": "Tennessee", "7": "UCLA", "8": "Georgia", "9": "TCU", "10": "UCF", "11": "South Florida", "12": "McNeese", "13": "California Baptist", "14": "Wright State", "15": "Furman", "16": "Siena"}},
+    {name:"Kerry M",picks:{"1": "Arizona", "2": "Houston", "3": "Gonzaga", "4": "Kansas", "5": "St Johns", "6": "Tennessee", "7": "Miami FL", "8": "Clemson", "9": "TCU", "10": "Missouri", "11": "South Florida", "12": "Akron", "13": "Hofstra", "14": "Wright State", "15": "Tennessee State", "16": "Siena"}},
+    {name:"Kim Ron",picks:{"1": "Arizona", "2": "UCONN", "3": "Virginia", "4": "Nebraska", "5": "St Johns", "6": "Louisville", "7": "UCLA", "8": "Georgia", "9": "TCU", "10": "Texas AM", "11": "Texas", "12": "High Point", "13": "Hofstra", "14": "Kennesaw St", "15": "Tennessee State", "16": "LIU"}},
+    {name:"KPT",picks:{"1": "Arizona", "2": "Houston", "3": "Michigan St", "4": "Arkansas", "5": "St Johns", "6": "Tennessee", "7": "Kentucky", "8": "Georgia", "9": "Iowa", "10": "Texas AM", "11": "Texas", "12": "High Point", "13": "Hawaii", "14": "North Dakota State", "15": "Idaho", "16": "Siena"}},
+    {name:"KV1",picks:{"1": "Michigan", "2": "Houston", "3": "Michigan St", "4": "Arkansas", "5": "St Johns", "6": "Tennessee", "7": "Miami FL", "8": "Clemson", "9": "Utah State", "10": "UCF", "11": "VCU", "12": "Akron", "13": "Troy", "14": "Kennesaw St", "15": "Tennessee State", "16": "Siena"}},
+    {name:"KV2",picks:{"1": "Arizona", "2": "Iowa State", "3": "Michigan St", "4": "Arkansas", "5": "Vanderbilt", "6": "Tennessee", "7": "UCLA", "8": "Villanova", "9": "Saint Louis", "10": "Texas AM", "11": "South Florida", "12": "McNeese", "13": "Hawaii", "14": "Wright State", "15": "Furman", "16": "Prairie View AM"}},
+    {name:"Lou D",picks:{"1": "Arizona", "2": "Iowa State", "3": "Illinois", "4": "Arkansas", "5": "St Johns", "6": "Tennessee", "7": "Saint Mary's", "8": "Clemson", "9": "Utah State", "10": "Missouri", "11": "Texas", "12": "High Point", "13": "California Baptist", "14": "Kennesaw St", "15": "Queens", "16": "Howard"}},
+    {name:"Lovable Loser 1",picks:{"1": "Arizona", "2": "Houston", "3": "Virginia", "4": "Arkansas", "5": "St Johns", "6": "BYU", "7": "Miami FL", "8": "Ohio State", "9": "Utah State", "10": "Santa Clara", "11": "South Florida", "12": "High Point", "13": "Troy", "14": "U Penn", "15": "Furman", "16": "Siena"}},
+    {name:"Lovable Loser 2",picks:{"1": "Arizona", "2": "Houston", "3": "Michigan St", "4": "Arkansas", "5": "Wisconsin", "6": "BYU", "7": "Saint Mary's", "8": "Villanova", "9": "Saint Louis", "10": "Texas AM", "11": "Miami OH", "12": "Northern Iowa", "13": "Hofstra", "14": "U Penn", "15": "Idaho", "16": "Siena"}},
+    {name:"Lovable Loser 3",picks:{"1": "Florida", "2": "Purdue", "3": "Gonzaga", "4": "Alabama", "5": "Vanderbilt", "6": "BYU", "7": "Saint Mary's", "8": "Georgia", "9": "TCU", "10": "Texas AM", "11": "South Florida", "12": "Akron", "13": "Troy", "14": "Kennesaw St", "15": "Tennessee State", "16": "Howard"}},
+    {name:"Lovable Loser 4",picks:{"1": "Arizona", "2": "Iowa State", "3": "Virginia", "4": "Kansas", "5": "Vanderbilt", "6": "BYU", "7": "Saint Mary's", "8": "Clemson", "9": "TCU", "10": "Santa Clara", "11": "South Florida", "12": "High Point", "13": "Troy", "14": "Kennesaw St", "15": "Tennessee State", "16": "Siena"}},
+    {name:"Lovable Loser 5",picks:{"1": "Michigan", "2": "UCONN", "3": "Michigan St", "4": "Arkansas", "5": "Vanderbilt", "6": "North Carolina", "7": "UCLA", "8": "Georgia", "9": "Utah State", "10": "Texas AM", "11": "Miami OH", "12": "Northern Iowa", "13": "Hawaii", "14": "U Penn", "15": "Queens", "16": "Siena"}},
+    {name:"LSlatts1",picks:{"1": "Arizona", "2": "Iowa State", "3": "Michigan St", "4": "Alabama", "5": "Vanderbilt", "6": "Tennessee", "7": "UCLA", "8": "Ohio State", "9": "Iowa", "10": "Missouri", "11": "Texas", "12": "High Point", "13": "Troy", "14": "U Penn", "15": "Queens", "16": "Prairie View AM"}},
+    {name:"LSlatts2",picks:{"1": "Arizona", "2": "Iowa State", "3": "Michigan St", "4": "Nebraska", "5": "St Johns", "6": "Tennessee", "7": "Saint Mary's", "8": "Georgia", "9": "Utah State", "10": "UCF", "11": "Texas", "12": "High Point", "13": "Hawaii", "14": "Wright State", "15": "Furman", "16": "Howard"}},
+    {name:"LSlatts3",picks:{"1": "Arizona", "2": "Iowa State", "3": "Illinois", "4": "Arkansas", "5": "Vanderbilt", "6": "BYU", "7": "Miami FL", "8": "Ohio State", "9": "Saint Louis", "10": "Texas AM", "11": "South Florida", "12": "Akron", "13": "Hofstra", "14": "Wright State", "15": "Furman", "16": "Howard"}},
+    {name:"LSlatts4",picks:{"1": "Florida", "2": "Iowa State", "3": "Gonzaga", "4": "Arkansas", "5": "St Johns", "6": "Tennessee", "7": "UCLA", "8": "Georgia", "9": "Iowa", "10": "Missouri", "11": "VCU", "12": "High Point", "13": "Troy", "14": "U Penn", "15": "Queens", "16": "LIU"}},
+    {name:"LSlatts5",picks:{"1": "Duke", "2": "Houston", "3": "Michigan St", "4": "Arkansas", "5": "St Johns", "6": "Tennessee", "7": "UCLA", "8": "Georgia", "9": "Utah State", "10": "Missouri", "11": "South Florida", "12": "High Point", "13": "California Baptist", "14": "Kennesaw St", "15": "Tennessee State", "16": "LIU"}},
+    {name:"Luckman",picks:{"1": "Arizona", "2": "Iowa State", "3": "Michigan St", "4": "Kansas", "5": "Vanderbilt", "6": "BYU", "7": "UCLA", "8": "Ohio State", "9": "Iowa", "10": "Santa Clara", "11": "VCU", "12": "McNeese", "13": "Hofstra", "14": "Wright State", "15": "Furman", "16": "Prairie View AM"}},
+    {name:"Luckman2",picks:{"1": "Duke", "2": "Purdue", "3": "Illinois", "4": "Nebraska", "5": "Wisconsin", "6": "Tennessee", "7": "Saint Mary's", "8": "Georgia", "9": "Utah State", "10": "Santa Clara", "11": "Miami OH", "12": "Akron", "13": "Hofstra", "14": "Wright State", "15": "Furman", "16": "Howard"}},
+    {name:"Luckman3",picks:{"1": "Michigan", "2": "Houston", "3": "Gonzaga", "4": "Arkansas", "5": "St Johns", "6": "Tennessee", "7": "UCLA", "8": "Ohio State", "9": "Utah State", "10": "Santa Clara", "11": "South Florida", "12": "McNeese", "13": "Hofstra", "14": "Wright State", "15": "Furman", "16": "Siena"}},
+    {name:"Madness",picks:{"1": "Florida", "2": "Iowa State", "3": "Gonzaga", "4": "Nebraska", "5": "St Johns", "6": "Louisville", "7": "Miami FL", "8": "Georgia", "9": "TCU", "10": "Texas AM", "11": "Texas", "12": "High Point", "13": "Hofstra", "14": "U Penn", "15": "Tennessee State", "16": "LIU"}},
+    {name:"Magell",picks:{"1": "Michigan", "2": "Houston", "3": "Michigan St", "4": "Arkansas", "5": "St Johns", "6": "BYU", "7": "Miami FL", "8": "Villanova", "9": "TCU", "10": "Santa Clara", "11": "South Florida", "12": "McNeese", "13": "Hofstra", "14": "Kennesaw St", "15": "Furman", "16": "LIU"}},
+    {name:"magicman",picks:{"1": "Arizona", "2": "Houston", "3": "Michigan St", "4": "Kansas", "5": "St Johns", "6": "BYU", "7": "Saint Mary's", "8": "Clemson", "9": "TCU", "10": "Missouri", "11": "VCU", "12": "Akron", "13": "Hofstra", "14": "U Penn", "15": "Queens", "16": "Howard"}},
+    {name:"Major 1",picks:{"1": "Duke", "2": "Purdue", "3": "Virginia", "4": "Arkansas", "5": "Vanderbilt", "6": "North Carolina", "7": "Saint Mary's", "8": "Clemson", "9": "Utah State", "10": "Santa Clara", "11": "South Florida", "12": "Akron", "13": "California Baptist", "14": "North Dakota State", "15": "Tennessee State", "16": "Howard"}},
+    {name:"Major 2",picks:{"1": "Florida", "2": "Purdue", "3": "Michigan St", "4": "Arkansas", "5": "Texas Tech", "6": "Tennessee", "7": "Saint Mary's", "8": "Ohio State", "9": "Utah State", "10": "Santa Clara", "11": "VCU", "12": "Akron", "13": "California Baptist", "14": "Kennesaw St", "15": "Furman", "16": "Siena"}},
+    {name:"Major 3",picks:{"1": "Arizona", "2": "Houston", "3": "Virginia", "4": "Kansas", "5": "Vanderbilt", "6": "BYU", "7": "UCLA", "8": "Ohio State", "9": "Saint Louis", "10": "Missouri", "11": "VCU", "12": "Akron", "13": "Troy", "14": "North Dakota State", "15": "Queens", "16": "Siena"}},
+    {name:"Major 4",picks:{"1": "Florida", "2": "UCONN", "3": "Virginia", "4": "Arkansas", "5": "St Johns", "6": "Tennessee", "7": "Saint Mary's", "8": "Georgia", "9": "Utah State", "10": "Santa Clara", "11": "South Florida", "12": "High Point", "13": "Troy", "14": "U Penn", "15": "Tennessee State", "16": "Howard"}},
+    {name:"Major 5",picks:{"1": "Michigan", "2": "Houston", "3": "Gonzaga", "4": "Alabama", "5": "Vanderbilt", "6": "Tennessee", "7": "UCLA", "8": "Ohio State", "9": "Utah State", "10": "Santa Clara", "11": "South Florida", "12": "Northern Iowa", "13": "Hawaii", "14": "Wright State", "15": "Tennessee State", "16": "Prairie View AM"}},
+    {name:"Marzano1",picks:{"1": "Florida", "2": "Iowa State", "3": "Gonzaga", "4": "Alabama", "5": "St Johns", "6": "Tennessee", "7": "Saint Mary's", "8": "Ohio State", "9": "Utah State", "10": "Missouri", "11": "Texas", "12": "Akron", "13": "Troy", "14": "U Penn", "15": "Queens", "16": "Siena"}},
+    {name:"Marzano2",picks:{"1": "Arizona", "2": "Houston", "3": "Virginia", "4": "Nebraska", "5": "Texas Tech", "6": "Louisville", "7": "Kentucky", "8": "Georgia", "9": "Iowa", "10": "Texas AM", "11": "VCU", "12": "High Point", "13": "Hofstra", "14": "North Dakota State", "15": "Tennessee State", "16": "Siena"}},
+    {name:"Marzano3",picks:{"1": "Arizona", "2": "Iowa State", "3": "Illinois", "4": "Arkansas", "5": "Vanderbilt", "6": "Louisville", "7": "UCLA", "8": "Georgia", "9": "TCU", "10": "Missouri", "11": "VCU", "12": "Akron", "13": "California Baptist", "14": "North Dakota State", "15": "Furman", "16": "Prairie View AM"}},
+    {name:"Marzano4",picks:{"1": "Michigan", "2": "Houston", "3": "Michigan St", "4": "Arkansas", "5": "St Johns", "6": "BYU", "7": "Miami FL", "8": "Clemson", "9": "Utah State", "10": "Santa Clara", "11": "Miami OH", "12": "High Point", "13": "Hofstra", "14": "Wright State", "15": "Furman", "16": "Prairie View AM"}},
+    {name:"Marzano5",picks:{"1": "Michigan", "2": "UCONN", "3": "Gonzaga", "4": "Nebraska", "5": "St Johns", "6": "Tennessee", "7": "Miami FL", "8": "Clemson", "9": "Utah State", "10": "Texas AM", "11": "Texas", "12": "High Point", "13": "Hawaii", "14": "Wright State", "15": "Idaho", "16": "LIU"}},
+    {name:"Matt Compton1",picks:{"1": "Arizona", "2": "Iowa State", "3": "Illinois", "4": "Arkansas", "5": "St Johns", "6": "Tennessee", "7": "Saint Mary's", "8": "Georgia", "9": "TCU", "10": "Santa Clara", "11": "South Florida", "12": "Akron", "13": "California Baptist", "14": "Kennesaw St", "15": "Queens", "16": "Howard"}},
+    {name:"Matt Compton2",picks:{"1": "Duke", "2": "Purdue", "3": "Michigan St", "4": "Nebraska", "5": "St Johns", "6": "BYU", "7": "Saint Mary's", "8": "Clemson", "9": "TCU", "10": "Santa Clara", "11": "South Florida", "12": "High Point", "13": "California Baptist", "14": "Kennesaw St", "15": "Tennessee State", "16": "Howard"}},
+    {name:"MAUGELLO",picks:{"1": "Arizona", "2": "Houston", "3": "Virginia", "4": "Kansas", "5": "Wisconsin", "6": "BYU", "7": "UCLA", "8": "Ohio State", "9": "Saint Louis", "10": "Santa Clara", "11": "South Florida", "12": "Akron", "13": "Troy", "14": "U Penn", "15": "Tennessee State", "16": "Howard"}},
+    {name:"Michael Kops",picks:{"1": "Duke", "2": "Houston", "3": "Illinois", "4": "Kansas", "5": "St Johns", "6": "BYU", "7": "Kentucky", "8": "Villanova", "9": "TCU", "10": "UCF", "11": "VCU", "12": "Akron", "13": "Troy", "14": "North Dakota State", "15": "Furman", "16": "Siena"}},
+    {name:"Michael Kops 2",picks:{"1": "Arizona", "2": "Houston", "3": "Illinois", "4": "Kansas", "5": "Vanderbilt", "6": "BYU", "7": "Kentucky", "8": "Villanova", "9": "TCU", "10": "UCF", "11": "VCU", "12": "Akron", "13": "Troy", "14": "North Dakota State", "15": "Furman", "16": "Siena"}},
+    {name:"Mike B",picks:{"1": "Michigan", "2": "Purdue", "3": "Michigan St", "4": "Arkansas", "5": "Vanderbilt", "6": "Tennessee", "7": "Kentucky", "8": "Ohio State", "9": "Utah State", "10": "Texas AM", "11": "VCU", "12": "High Point", "13": "Hofstra", "14": "Kennesaw St", "15": "Furman", "16": "Prairie View AM"}},
+    {name:"Mike B 1",picks:{"1": "Duke", "2": "Houston", "3": "Michigan St", "4": "Arkansas", "5": "St Johns", "6": "BYU", "7": "Miami FL", "8": "Georgia", "9": "Iowa", "10": "UCF", "11": "South Florida", "12": "High Point", "13": "Hofstra", "14": "Wright State", "15": "Furman", "16": "Prairie View AM"}},
+    {name:"Mike Balzano",picks:{"1": "Arizona", "2": "Iowa State", "3": "Illinois", "4": "Arkansas", "5": "St Johns", "6": "BYU", "7": "Miami FL", "8": "Georgia", "9": "TCU", "10": "Texas AM", "11": "South Florida", "12": "High Point", "13": "Hofstra", "14": "Kennesaw St", "15": "Furman", "16": "Siena"}},
+    {name:"Mike Kemp 2",picks:{"1": "Arizona", "2": "Houston", "3": "Virginia", "4": "Arkansas", "5": "Vanderbilt", "6": "BYU", "7": "Saint Mary's", "8": "Ohio State", "9": "Utah State", "10": "Texas AM", "11": "South Florida", "12": "McNeese", "13": "Hofstra", "14": "U Penn", "15": "Furman", "16": "Prairie View AM"}},
+    {name:"Mike Kemp1",picks:{"1": "Duke", "2": "Houston", "3": "Michigan St", "4": "Nebraska", "5": "Vanderbilt", "6": "Louisville", "7": "UCLA", "8": "Georgia", "9": "Iowa", "10": "Santa Clara", "11": "Miami OH", "12": "High Point", "13": "California Baptist", "14": "Wright State", "15": "Idaho", "16": "Howard"}},
+    {name:"Mike Kollar 1",picks:{"1": "Arizona", "2": "Houston", "3": "Michigan St", "4": "Arkansas", "5": "Vanderbilt", "6": "BYU", "7": "Miami FL", "8": "Ohio State", "9": "Iowa", "10": "Santa Clara", "11": "Miami OH", "12": "High Point", "13": "Hawaii", "14": "Wright State", "15": "Queens", "16": "Prairie View AM"}},
+    {name:"Mike Kollar 2",picks:{"1": "Duke", "2": "Houston", "3": "Gonzaga", "4": "Alabama", "5": "Vanderbilt", "6": "BYU", "7": "Miami FL", "8": "Ohio State", "9": "Utah State", "10": "Texas AM", "11": "Miami OH", "12": "High Point", "13": "Hawaii", "14": "Wright State", "15": "Queens", "16": "Prairie View AM"}},
+    {name:"MJC1",picks:{"1": "Florida", "2": "Iowa State", "3": "Michigan St", "4": "Arkansas", "5": "St Johns", "6": "Tennessee", "7": "UCLA", "8": "Ohio State", "9": "Utah State", "10": "Missouri", "11": "VCU", "12": "Akron", "13": "California Baptist", "14": "Wright State", "15": "Furman", "16": "Howard"}},
+    {name:"MJC2",picks:{"1": "Duke", "2": "Houston", "3": "Gonzaga", "4": "Alabama", "5": "Texas Tech", "6": "BYU", "7": "Kentucky", "8": "Clemson", "9": "Saint Louis", "10": "UCF", "11": "South Florida", "12": "High Point", "13": "Troy", "14": "U Penn", "15": "Queens", "16": "Prairie View AM"}},
+    {name:"MJC3",picks:{"1": "Arizona", "2": "Iowa State", "3": "Illinois", "4": "Nebraska", "5": "Vanderbilt", "6": "North Carolina", "7": "Saint Mary's", "8": "Georgia", "9": "Iowa", "10": "Santa Clara", "11": "Texas", "12": "Akron", "13": "Hofstra", "14": "Kennesaw St", "15": "Idaho", "16": "Howard"}},
+    {name:"MJC4",picks:{"1": "Michigan", "2": "Purdue", "3": "Michigan St", "4": "Nebraska", "5": "St Johns", "6": "Tennessee", "7": "Kentucky", "8": "Ohio State", "9": "Iowa", "10": "Texas AM", "11": "Texas", "12": "High Point", "13": "California Baptist", "14": "Kennesaw St", "15": "Tennessee State", "16": "Siena"}},
+    {name:"MJC5",picks:{"1": "Arizona", "2": "Houston", "3": "Michigan St", "4": "Alabama", "5": "Wisconsin", "6": "Tennessee", "7": "UCLA", "8": "Clemson", "9": "TCU", "10": "Santa Clara", "11": "Texas", "12": "Akron", "13": "Troy", "14": "U Penn", "15": "Queens", "16": "Siena"}},
+    {name:"MK1",picks:{"1": "Florida", "2": "Iowa State", "3": "Michigan St", "4": "Arkansas", "5": "Vanderbilt", "6": "BYU", "7": "Saint Mary's", "8": "Ohio State", "9": "Iowa", "10": "Santa Clara", "11": "VCU", "12": "Akron", "13": "Hofstra", "14": "Wright State", "15": "Idaho", "16": "Siena"}},
+    {name:"MK2",picks:{"1": "Arizona", "2": "Iowa State", "3": "Illinois", "4": "Alabama", "5": "St Johns", "6": "Tennessee", "7": "UCLA", "8": "Georgia", "9": "Iowa", "10": "Missouri", "11": "Texas", "12": "High Point", "13": "Troy", "14": "North Dakota State", "15": "Furman", "16": "Siena"}},
+    {name:"MK3",picks:{"1": "Michigan", "2": "UCONN", "3": "Illinois", "4": "Nebraska", "5": "Wisconsin", "6": "Tennessee", "7": "Kentucky", "8": "Ohio State", "9": "Utah State", "10": "Missouri", "11": "South Florida", "12": "Northern Iowa", "13": "Hofstra", "14": "Wright State", "15": "Queens", "16": "Siena"}},
+    {name:"MK4",picks:{"1": "Michigan", "2": "Houston", "3": "Michigan St", "4": "Arkansas", "5": "St Johns", "6": "North Carolina", "7": "UCLA", "8": "Ohio State", "9": "Iowa", "10": "Santa Clara", "11": "Texas", "12": "Akron", "13": "Troy", "14": "Wright State", "15": "Furman", "16": "Siena"}},
+    {name:"MK5",picks:{"1": "Duke", "2": "Purdue", "3": "Virginia", "4": "Arkansas", "5": "Vanderbilt", "6": "Louisville", "7": "UCLA", "8": "Georgia", "9": "Utah State", "10": "Texas AM", "11": "VCU", "12": "Northern Iowa", "13": "California Baptist", "14": "North Dakota State", "15": "Furman", "16": "Howard"}},
+    {name:"Nstoecker32",picks:{"1": "Michigan", "2": "Houston", "3": "Michigan St", "4": "Arkansas", "5": "Texas Tech", "6": "Tennessee", "7": "UCLA", "8": "Clemson", "9": "Saint Louis", "10": "UCF", "11": "Texas", "12": "High Point", "13": "Hofstra", "14": "Wright State", "15": "Furman", "16": "Prairie View AM"}},
+    {name:"Olivia Pope",picks:{"1": "Arizona", "2": "Houston", "3": "Gonzaga", "4": "Arkansas", "5": "Vanderbilt", "6": "BYU", "7": "UCLA", "8": "Georgia", "9": "TCU", "10": "Santa Clara", "11": "VCU", "12": "High Point", "13": "Hofstra", "14": "U Penn", "15": "Furman", "16": "Siena"}},
+    {name:"Oooof",picks:{"1": "Arizona", "2": "Houston", "3": "Gonzaga", "4": "Arkansas", "5": "St Johns", "6": "Tennessee", "7": "UCLA", "8": "Clemson", "9": "TCU", "10": "Missouri", "11": "VCU", "12": "High Point", "13": "Hofstra", "14": "Wright State", "15": "Queens", "16": "LIU"}},
+    {name:"Operation Epic Fury",picks:{"1": "Michigan", "2": "UCONN", "3": "Illinois", "4": "Arkansas", "5": "St Johns", "6": "Tennessee", "7": "Saint Mary's", "8": "Georgia", "9": "Iowa", "10": "Missouri", "11": "Texas", "12": "Akron", "13": "Troy", "14": "North Dakota State", "15": "Furman", "16": "Siena"}},
+    {name:"Oyster King",picks:{"1": "Arizona", "2": "Purdue", "3": "Michigan St", "4": "Alabama", "5": "Texas Tech", "6": "Tennessee", "7": "UCLA", "8": "Clemson", "9": "Iowa", "10": "Santa Clara", "11": "Miami OH", "12": "High Point", "13": "Hofstra", "14": "U Penn", "15": "Queens", "16": "LIU"}},
+    {name:"Oyster King2",picks:{"1": "Michigan", "2": "UCONN", "3": "Virginia", "4": "Kansas", "5": "Texas Tech", "6": "North Carolina", "7": "Miami FL", "8": "Clemson", "9": "Saint Louis", "10": "Texas AM", "11": "South Florida", "12": "McNeese", "13": "Troy", "14": "North Dakota State", "15": "Furman", "16": "Howard"}},
+    {name:"Parquet",picks:{"1": "Duke", "2": "Purdue", "3": "Michigan St", "4": "Arkansas", "5": "St Johns", "6": "Louisville", "7": "Kentucky", "8": "Clemson", "9": "TCU", "10": "Texas AM", "11": "VCU", "12": "High Point", "13": "Hofstra", "14": "Kennesaw St", "15": "Queens", "16": "LIU"}},
+    {name:"Pete Lamba",picks:{"1": "Michigan", "2": "Houston", "3": "Michigan St", "4": "Arkansas", "5": "Vanderbilt", "6": "Louisville", "7": "UCLA", "8": "Villanova", "9": "TCU", "10": "Texas AM", "11": "VCU", "12": "High Point", "13": "Hofstra", "14": "Wright State", "15": "Tennessee State", "16": "LIU"}},
+    {name:"Petrullo1",picks:{"1": "Duke", "2": "Houston", "3": "Gonzaga", "4": "Nebraska", "5": "Wisconsin", "6": "Tennessee", "7": "UCLA", "8": "Clemson", "9": "Utah State", "10": "Missouri", "11": "VCU", "12": "Akron", "13": "Hofstra", "14": "Wright State", "15": "Idaho", "16": "Howard"}},
+    {name:"Petrullo2",picks:{"1": "Arizona", "2": "Houston", "3": "Virginia", "4": "Kansas", "5": "Vanderbilt", "6": "BYU", "7": "UCLA", "8": "Clemson", "9": "TCU", "10": "Texas AM", "11": "South Florida", "12": "High Point", "13": "Hofstra", "14": "Kennesaw St", "15": "Furman", "16": "LIU"}},
+    {name:"Petrullo3",picks:{"1": "Michigan", "2": "Houston", "3": "Michigan St", "4": "Arkansas", "5": "Wisconsin", "6": "North Carolina", "7": "UCLA", "8": "Ohio State", "9": "Iowa", "10": "Missouri", "11": "Texas", "12": "Akron", "13": "Troy", "14": "U Penn", "15": "Queens", "16": "LIU"}},
+    {name:"Petrullo4",picks:{"1": "Arizona", "2": "Iowa State", "3": "Michigan St", "4": "Alabama", "5": "Wisconsin", "6": "BYU", "7": "UCLA", "8": "Georgia", "9": "Utah State", "10": "Missouri", "11": "Miami OH", "12": "Akron", "13": "Troy", "14": "North Dakota State", "15": "Queens", "16": "Siena"}},
+    {name:"Petrullo5",picks:{"1": "Florida", "2": "Purdue", "3": "Illinois", "4": "Arkansas", "5": "St Johns", "6": "Tennessee", "7": "UCLA", "8": "Ohio State", "9": "Iowa", "10": "Santa Clara", "11": "Texas", "12": "McNeese", "13": "Troy", "14": "U Penn", "15": "Idaho", "16": "Howard"}},
+    {name:"Piper 3",picks:{"1": "Michigan", "2": "Houston", "3": "Gonzaga", "4": "Arkansas", "5": "Vanderbilt", "6": "BYU", "7": "UCLA", "8": "Georgia", "9": "TCU", "10": "Texas AM", "11": "South Florida", "12": "Akron", "13": "Hofstra", "14": "Wright State", "15": "Furman", "16": "Siena"}},
+    {name:"Prescott1",picks:{"1": "Arizona", "2": "Houston", "3": "Michigan St", "4": "Nebraska", "5": "Texas Tech", "6": "BYU", "7": "Miami FL", "8": "Clemson", "9": "Iowa", "10": "Texas AM", "11": "Miami OH", "12": "Northern Iowa", "13": "Hawaii", "14": "U Penn", "15": "Queens", "16": "Prairie View AM"}},
+    {name:"Prescott2",picks:{"1": "Michigan", "2": "UCONN", "3": "Gonzaga", "4": "Alabama", "5": "St Johns", "6": "North Carolina", "7": "Miami FL", "8": "Villanova", "9": "TCU", "10": "UCF", "11": "South Florida", "12": "McNeese", "13": "Troy", "14": "North Dakota State", "15": "Tennessee State", "16": "LIU"}},
+    {name:"Prescott3",picks:{"1": "Michigan", "2": "UCONN", "3": "Illinois", "4": "Arkansas", "5": "St Johns", "6": "Louisville", "7": "Kentucky", "8": "Georgia", "9": "Iowa", "10": "Missouri", "11": "VCU", "12": "Akron", "13": "Hofstra", "14": "Wright State", "15": "Idaho", "16": "Prairie View AM"}},
+    {name:"Prescott4",picks:{"1": "Duke", "2": "Houston", "3": "Illinois", "4": "Arkansas", "5": "Vanderbilt", "6": "Tennessee", "7": "Saint Mary's", "8": "Villanova", "9": "Iowa", "10": "Santa Clara", "11": "Texas", "12": "Northern Iowa", "13": "Hawaii", "14": "North Dakota State", "15": "Idaho", "16": "Howard"}},
+    {name:"Prescott5",picks:{"1": "Florida", "2": "Purdue", "3": "Virginia", "4": "Nebraska", "5": "Wisconsin", "6": "BYU", "7": "UCLA", "8": "Ohio State", "9": "Utah State", "10": "Santa Clara", "11": "South Florida", "12": "Northern Iowa", "13": "Hofstra", "14": "U Penn", "15": "Tennessee State", "16": "Howard"}},
+    {name:"R Lax",picks:{"1": "Duke", "2": "Iowa State", "3": "Michigan St", "4": "Arkansas", "5": "St Johns", "6": "BYU", "7": "Miami FL", "8": "Ohio State", "9": "Saint Louis", "10": "Santa Clara", "11": "Miami OH", "12": "McNeese", "13": "Hofstra", "14": "Kennesaw St", "15": "Queens", "16": "Siena"}},
+    {name:"Rimkus",picks:{"1": "Arizona", "2": "Houston", "3": "Michigan St", "4": "Alabama", "5": "Vanderbilt", "6": "North Carolina", "7": "UCLA", "8": "Ohio State", "9": "Saint Louis", "10": "Santa Clara", "11": "Texas", "12": "Akron", "13": "Troy", "14": "U Penn", "15": "Tennessee State", "16": "Howard"}},
+    {name:"Rob Robbins",picks:{"1": "Arizona", "2": "UCONN", "3": "Illinois", "4": "Arkansas", "5": "St Johns", "6": "Tennessee", "7": "Miami FL", "8": "Ohio State", "9": "Saint Louis", "10": "Texas AM", "11": "Texas", "12": "Akron", "13": "Troy", "14": "Wright State", "15": "Queens", "16": "Siena"}},
+    {name:"Ryan-4",picks:{"1": "Florida", "2": "Iowa State", "3": "Michigan St", "4": "Alabama", "5": "Wisconsin", "6": "BYU", "7": "Saint Mary's", "8": "Ohio State", "9": "Utah State", "10": "Santa Clara", "11": "VCU", "12": "McNeese", "13": "Troy", "14": "Kennesaw St", "15": "Queens", "16": "Howard"}},
+    {name:"SARDBEAR",picks:{"1": "Florida", "2": "Purdue", "3": "Michigan St", "4": "Kansas", "5": "Texas Tech", "6": "Tennessee", "7": "Saint Mary's", "8": "Georgia", "9": "Utah State", "10": "Santa Clara", "11": "South Florida", "12": "Akron", "13": "Hawaii", "14": "North Dakota State", "15": "Idaho", "16": "Howard"}},
+    {name:"Scardino1",picks:{"1": "Arizona", "2": "Houston", "3": "Illinois", "4": "Alabama", "5": "Vanderbilt", "6": "BYU", "7": "Miami FL", "8": "Clemson", "9": "TCU", "10": "Santa Clara", "11": "South Florida", "12": "Northern Iowa", "13": "Troy", "14": "Wright State", "15": "Tennessee State", "16": "Siena"}},
+    {name:"Scardino2",picks:{"1": "Michigan", "2": "Houston", "3": "Michigan St", "4": "Arkansas", "5": "St Johns", "6": "Tennessee", "7": "Miami FL", "8": "Clemson", "9": "Utah State", "10": "Santa Clara", "11": "VCU", "12": "High Point", "13": "Hofstra", "14": "U Penn", "15": "Furman", "16": "LIU"}},
+    {name:"Sean Fox 2",picks:{"1": "Arizona", "2": "Houston", "3": "Michigan St", "4": "Arkansas", "5": "St Johns", "6": "Tennessee", "7": "UCLA", "8": "Ohio State", "9": "Iowa", "10": "Missouri", "11": "South Florida", "12": "Akron", "13": "Troy", "14": "Kennesaw St", "15": "Furman", "16": "Siena"}},
+    {name:"SeanFox1",picks:{"1": "Michigan", "2": "Houston", "3": "Michigan St", "4": "Arkansas", "5": "Vanderbilt", "6": "BYU", "7": "Saint Mary's", "8": "Ohio State", "9": "Utah State", "10": "Santa Clara", "11": "South Florida", "12": "Akron", "13": "California Baptist", "14": "U Penn", "15": "Tennessee State", "16": "Siena"}},
+    {name:"SeanFox3",picks:{"1": "Arizona", "2": "Houston", "3": "Virginia", "4": "Arkansas", "5": "St Johns", "6": "BYU", "7": "UCLA", "8": "Clemson", "9": "TCU", "10": "Santa Clara", "11": "South Florida", "12": "High Point", "13": "Troy", "14": "North Dakota State", "15": "Queens", "16": "Howard"}},
+    {name:"SeanFox4",picks:{"1": "Duke", "2": "UCONN", "3": "Illinois", "4": "Kansas", "5": "St Johns", "6": "North Carolina", "7": "Miami FL", "8": "Ohio State", "9": "Saint Louis", "10": "Santa Clara", "11": "South Florida", "12": "Akron", "13": "Hawaii", "14": "Wright State", "15": "Furman", "16": "Howard"}},
+    {name:"SeanFox5-Lush",picks:{"1": "Duke", "2": "Iowa State", "3": "Illinois", "4": "Arkansas", "5": "Wisconsin", "6": "Louisville", "7": "UCLA", "8": "Clemson", "9": "Saint Louis", "10": "Santa Clara", "11": "Miami OH", "12": "Akron", "13": "Hofstra", "14": "North Dakota State", "15": "Furman", "16": "Siena"}},
+    {name:"Sef 1",picks:{"1": "Arizona", "2": "Iowa State", "3": "Illinois", "4": "Kansas", "5": "Vanderbilt", "6": "Tennessee", "7": "Saint Mary's", "8": "Georgia", "9": "TCU", "10": "Missouri", "11": "South Florida", "12": "High Point", "13": "Hofstra", "14": "Wright State", "15": "Furman", "16": "Prairie View AM"}},
+    {name:"Sef 2",picks:{"1": "Arizona", "2": "Iowa State", "3": "Illinois", "4": "Kansas", "5": "Vanderbilt", "6": "Louisville", "7": "UCLA", "8": "Georgia", "9": "TCU", "10": "Texas AM", "11": "Texas", "12": "High Point", "13": "Hofstra", "14": "Wright State", "15": "Furman", "16": "Prairie View AM"}},
+    {name:"Sef 3",picks:{"1": "Michigan", "2": "Houston", "3": "Michigan St", "4": "Arkansas", "5": "St Johns", "6": "Tennessee", "7": "UCLA", "8": "Ohio State", "9": "Utah State", "10": "Santa Clara", "11": "VCU", "12": "Akron", "13": "Troy", "14": "Wright State", "15": "Queens", "16": "Prairie View AM"}},
+    {name:"Sef 4",picks:{"1": "Duke", "2": "Houston", "3": "Virginia", "4": "Arkansas", "5": "Texas Tech", "6": "North Carolina", "7": "UCLA", "8": "Georgia", "9": "Utah State", "10": "Santa Clara", "11": "South Florida", "12": "McNeese", "13": "California Baptist", "14": "Kennesaw St", "15": "Tennessee State", "16": "LIU"}},
+    {name:"Sef 5",picks:{"1": "Michigan", "2": "UCONN", "3": "Gonzaga", "4": "Nebraska", "5": "Wisconsin", "6": "Tennessee", "7": "Miami FL", "8": "Ohio State", "9": "Utah State", "10": "Texas AM", "11": "VCU", "12": "Akron", "13": "California Baptist", "14": "North Dakota State", "15": "Tennessee State", "16": "LIU"}},
+    {name:"Silver & DVD 1",picks:{"1": "Florida", "2": "Iowa State", "3": "Illinois", "4": "Arkansas", "5": "Vanderbilt", "6": "Tennessee", "7": "UCLA", "8": "Georgia", "9": "Utah State", "10": "Texas AM", "11": "South Florida", "12": "Akron", "13": "Troy", "14": "U Penn", "15": "Queens", "16": "Howard"}},
+    {name:"Silver & DVD 2",picks:{"1": "Arizona", "2": "Houston", "3": "Gonzaga", "4": "Kansas", "5": "Texas Tech", "6": "BYU", "7": "Miami FL", "8": "Ohio State", "9": "TCU", "10": "Santa Clara", "11": "VCU", "12": "Northern Iowa", "13": "Hawaii", "14": "Wright State", "15": "Furman", "16": "LIU"}},
+    {name:"Silver & DVD 3",picks:{"1": "Arizona", "2": "UCONN", "3": "Michigan St", "4": "Arkansas", "5": "St Johns", "6": "BYU", "7": "Saint Mary's", "8": "Ohio State", "9": "Iowa", "10": "Santa Clara", "11": "Miami OH", "12": "Akron", "13": "Hofstra", "14": "North Dakota State", "15": "Furman", "16": "Siena"}},
+    {name:"Silver & DVD 4",picks:{"1": "Michigan", "2": "Purdue", "3": "Illinois", "4": "Nebraska", "5": "Vanderbilt", "6": "Louisville", "7": "UCLA", "8": "Georgia", "9": "Saint Louis", "10": "Missouri", "11": "VCU", "12": "Akron", "13": "Hawaii", "14": "U Penn", "15": "Idaho", "16": "Siena"}},
+    {name:"silver & DVD 5",picks:{"1": "Florida", "2": "Houston", "3": "Virginia", "4": "Arkansas", "5": "St Johns", "6": "North Carolina", "7": "UCLA", "8": "Clemson", "9": "TCU", "10": "Santa Clara", "11": "Texas", "12": "McNeese", "13": "California Baptist", "14": "U Penn", "15": "Tennessee State", "16": "Prairie View AM"}},
+    {name:"SMiller",picks:{"1": "Duke", "2": "Purdue", "3": "Michigan St", "4": "Arkansas", "5": "Vanderbilt", "6": "Tennessee", "7": "Kentucky", "8": "Clemson", "9": "TCU", "10": "UCF", "11": "VCU", "12": "High Point", "13": "Troy", "14": "U Penn", "15": "Tennessee State", "16": "LIU"}},
+    {name:"Soccerruff",picks:{"1": "Arizona", "2": "Houston", "3": "Gonzaga", "4": "Kansas", "5": "St Johns", "6": "BYU", "7": "Saint Mary's", "8": "Villanova", "9": "Iowa", "10": "Santa Clara", "11": "Miami OH", "12": "Northern Iowa", "13": "Hofstra", "14": "North Dakota State", "15": "Tennessee State", "16": "Siena"}},
+    {name:"TCrowley",picks:{"1": "Michigan", "2": "UCONN", "3": "Gonzaga", "4": "Nebraska", "5": "St Johns", "6": "North Carolina", "7": "Saint Mary's", "8": "Villanova", "9": "Saint Louis", "10": "UCF", "11": "VCU", "12": "Akron", "13": "Hofstra", "14": "U Penn", "15": "Queens", "16": "LIU"}},
+    {name:"Tikko 1",picks:{"1": "Duke", "2": "Purdue", "3": "Gonzaga", "4": "Nebraska", "5": "St Johns", "6": "Tennessee", "7": "UCLA", "8": "Georgia", "9": "TCU", "10": "Santa Clara", "11": "South Florida", "12": "Akron", "13": "Hofstra", "14": "Wright State", "15": "Furman", "16": "Siena"}},
+    {name:"Tim Trava",picks:{"1": "Arizona", "2": "Iowa State", "3": "Michigan St", "4": "Arkansas", "5": "St Johns", "6": "Tennessee", "7": "UCLA", "8": "Clemson", "9": "TCU", "10": "Missouri", "11": "Texas", "12": "Akron", "13": "Hofstra", "14": "North Dakota State", "15": "Queens", "16": "Siena"}},
+    {name:"Tom Giuffre",picks:{"1": "Arizona", "2": "Houston", "3": "Michigan St", "4": "Alabama", "5": "Vanderbilt", "6": "BYU", "7": "Miami FL", "8": "Ohio State", "9": "Saint Louis", "10": "Santa Clara", "11": "South Florida", "12": "Akron", "13": "California Baptist", "14": "Kennesaw St", "15": "Furman", "16": "Siena"}},
+    {name:"tomcap1",picks:{"1": "Florida", "2": "UCONN", "3": "Illinois", "4": "Arkansas", "5": "St Johns", "6": "BYU", "7": "Miami FL", "8": "Clemson", "9": "Saint Louis", "10": "Santa Clara", "11": "Miami OH", "12": "High Point", "13": "Hofstra", "14": "U Penn", "15": "Queens", "16": "LIU"}},
+    {name:"tomcap2",picks:{"1": "Michigan", "2": "Purdue", "3": "Illinois", "4": "Arkansas", "5": "Vanderbilt", "6": "Louisville", "7": "Saint Mary's", "8": "Ohio State", "9": "Utah State", "10": "Missouri", "11": "Texas", "12": "High Point", "13": "Troy", "14": "North Dakota State", "15": "Tennessee State", "16": "LIU"}},
+    {name:"tomcap3",picks:{"1": "Michigan", "2": "Purdue", "3": "Michigan St", "4": "Nebraska", "5": "St Johns", "6": "North Carolina", "7": "UCLA", "8": "Ohio State", "9": "Iowa", "10": "UCF", "11": "VCU", "12": "High Point", "13": "Hawaii", "14": "Kennesaw St", "15": "Idaho", "16": "Howard"}},
+    {name:"tomcap4",picks:{"1": "Duke", "2": "UCONN", "3": "Virginia", "4": "Kansas", "5": "St Johns", "6": "North Carolina", "7": "Kentucky", "8": "Ohio State", "9": "Iowa", "10": "Texas AM", "11": "Texas", "12": "Northern Iowa", "13": "Hawaii", "14": "U Penn", "15": "Tennessee State", "16": "Howard"}},
+    {name:"tomcap5",picks:{"1": "Florida", "2": "UCONN", "3": "Virginia", "4": "Alabama", "5": "St Johns", "6": "Tennessee", "7": "Miami FL", "8": "Ohio State", "9": "Iowa", "10": "Santa Clara", "11": "Miami OH", "12": "Northern Iowa", "13": "Hofstra", "14": "North Dakota State", "15": "Queens", "16": "LIU"}},
+    {name:"tomcap6",picks:{"1": "Arizona", "2": "Houston", "3": "Michigan St", "4": "Arkansas", "5": "Texas Tech", "6": "BYU", "7": "UCLA", "8": "Ohio State", "9": "TCU", "10": "Santa Clara", "11": "VCU", "12": "Akron", "13": "California Baptist", "14": "Wright State", "15": "Furman", "16": "Prairie View AM"}},
+    {name:"tomcapE",picks:{"1": "Arizona", "2": "Iowa State", "3": "Michigan St", "4": "Alabama", "5": "Vanderbilt", "6": "BYU", "7": "Saint Mary's", "8": "Georgia", "9": "Iowa", "10": "UCF", "11": "VCU", "12": "High Point", "13": "California Baptist", "14": "Kennesaw St", "15": "Furman", "16": "Howard"}},
+    {name:"tomcapJ",picks:{"1": "Arizona", "2": "UCONN", "3": "Illinois", "4": "Alabama", "5": "Vanderbilt", "6": "Louisville", "7": "Miami FL", "8": "Georgia", "9": "Utah State", "10": "Texas AM", "11": "Texas", "12": "High Point", "13": "Hawaii", "14": "Wright State", "15": "Furman", "16": "Howard"}},
+    {name:"tomcapM",picks:{"1": "Arizona", "2": "Iowa State", "3": "Virginia", "4": "Nebraska", "5": "St Johns", "6": "BYU", "7": "Saint Mary's", "8": "Georgia", "9": "Iowa", "10": "UCF", "11": "Miami OH", "12": "High Point", "13": "California Baptist", "14": "Kennesaw St", "15": "Furman", "16": "Howard"}},
+    {name:"tomcapT",picks:{"1": "Michigan", "2": "Iowa State", "3": "Gonzaga", "4": "Arkansas", "5": "St Johns", "6": "BYU", "7": "Miami FL", "8": "Clemson", "9": "Utah State", "10": "UCF", "11": "VCU", "12": "High Point", "13": "California Baptist", "14": "Kennesaw St", "15": "Furman", "16": "Prairie View AM"}},
+    {name:"Tommy Corr",picks:{"1": "Arizona", "2": "Iowa State", "3": "Michigan St", "4": "Arkansas", "5": "St Johns", "6": "Tennessee", "7": "Miami FL", "8": "Clemson", "9": "Saint Louis", "10": "Texas AM", "11": "VCU", "12": "Akron", "13": "Troy", "14": "Kennesaw St", "15": "Furman", "16": "Siena"}},
+    {name:"Tommy Corr Jr.",picks:{"1": "Arizona", "2": "Iowa State", "3": "Illinois", "4": "Arkansas", "5": "Vanderbilt", "6": "BYU", "7": "UCLA", "8": "Ohio State", "9": "Saint Louis", "10": "Texas AM", "11": "South Florida", "12": "Akron", "13": "California Baptist", "14": "Kennesaw St", "15": "Furman", "16": "LIU"}},
+    {name:"Tracky007",picks:{"1": "Florida", "2": "Iowa State", "3": "Michigan St", "4": "Alabama", "5": "Texas Tech", "6": "Tennessee", "7": "Kentucky", "8": "Clemson", "9": "Utah State", "10": "Texas AM", "11": "Texas", "12": "McNeese", "13": "Troy", "14": "Wright State", "15": "Furman", "16": "Howard"}},
+    {name:"troy’s boys",picks:{"1": "Arizona", "2": "Iowa State", "3": "Virginia", "4": "Arkansas", "5": "St Johns", "6": "BYU", "7": "Saint Mary's", "8": "Ohio State", "9": "Utah State", "10": "Santa Clara", "11": "South Florida", "12": "Akron", "13": "Troy", "14": "U Penn", "15": "Tennessee State", "16": "Siena"}},
+    {name:"Tug",picks:{"1": "Duke", "2": "Houston", "3": "Gonzaga", "4": "Kansas", "5": "Wisconsin", "6": "Tennessee", "7": "UCLA", "8": "Clemson", "9": "Utah State", "10": "Santa Clara", "11": "South Florida", "12": "Northern Iowa", "13": "Hawaii", "14": "U Penn", "15": "Queens", "16": "Prairie View AM"}},
+    {name:"Tug II",picks:{"1": "Arizona", "2": "Iowa State", "3": "Michigan St", "4": "Arkansas", "5": "Vanderbilt", "6": "BYU", "7": "Saint Mary's", "8": "Clemson", "9": "TCU", "10": "Santa Clara", "11": "VCU", "12": "Akron", "13": "Hofstra", "14": "Wright State", "15": "Furman", "16": "Prairie View AM"}},
+    {name:"Wells Brothers 1",picks:{"1": "Arizona", "2": "Houston", "3": "Gonzaga", "4": "Kansas", "5": "Vanderbilt", "6": "Tennessee", "7": "UCLA", "8": "Ohio State", "9": "Iowa", "10": "Santa Clara", "11": "VCU", "12": "Akron", "13": "Hawaii", "14": "Wright State", "15": "Queens", "16": "Siena"}},
+    {name:"Wells Brothers 2",picks:{"1": "Michigan", "2": "UCONN", "3": "Illinois", "4": "Arkansas", "5": "St Johns", "6": "Tennessee", "7": "Saint Mary's", "8": "Ohio State", "9": "Utah State", "10": "Santa Clara", "11": "Texas", "12": "McNeese", "13": "Hofstra", "14": "Kennesaw St", "15": "Queens", "16": "Siena"}},
+    {name:"Wiljiro",picks:{"1": "Duke", "2": "Iowa State", "3": "Michigan St", "4": "Arkansas", "5": "St Johns", "6": "BYU", "7": "Miami FL", "8": "Ohio State", "9": "Utah State", "10": "Missouri", "11": "South Florida", "12": "Akron", "13": "Hofstra", "14": "U Penn", "15": "Queens", "16": "LIU"}},
+    {name:"Wineguy22",picks:{"1": "Arizona", "2": "Houston", "3": "Gonzaga", "4": "Arkansas", "5": "Vanderbilt", "6": "Tennessee", "7": "UCLA", "8": "Clemson", "9": "Saint Louis", "10": "Santa Clara", "11": "South Florida", "12": "Akron", "13": "California Baptist", "14": "Wright State", "15": "Queens", "16": "Prairie View AM"}},
+    {name:"Wisconsin Cheesehead",picks:{"1": "Michigan", "2": "Houston", "3": "Virginia", "4": "Kansas", "5": "Wisconsin", "6": "BYU", "7": "UCLA", "8": "Ohio State", "9": "Saint Louis", "10": "Missouri", "11": "South Florida", "12": "McNeese", "13": "Troy", "14": "Kennesaw St", "15": "Idaho", "16": "Prairie View AM"}},
+    {name:"Wisconsin Cheeseheads 2",picks:{"1": "Arizona", "2": "UCONN", "3": "Illinois", "4": "Alabama", "5": "Wisconsin", "6": "Tennessee", "7": "UCLA", "8": "Georgia", "9": "Iowa", "10": "Texas AM", "11": "VCU", "12": "Northern Iowa", "13": "Hofstra", "14": "North Dakota State", "15": "Queens", "16": "Siena"}},
+    {name:"YNOT",picks:{"1": "Arizona", "2": "Houston", "3": "Michigan St", "4": "Arkansas", "5": "St Johns", "6": "Tennessee", "7": "UCLA", "8": "Clemson", "9": "TCU", "10": "Santa Clara", "11": "South Florida", "12": "Akron", "13": "Hofstra", "14": "Wright State", "15": "Furman", "16": "Prairie View AM"}},
+    {name:"YNOT2",picks:{"1": "Duke", "2": "Purdue", "3": "Virginia", "4": "Arkansas", "5": "Vanderbilt", "6": "BYU", "7": "Saint Mary's", "8": "Clemson", "9": "Saint Louis", "10": "Missouri", "11": "VCU", "12": "Akron", "13": "Troy", "14": "U Penn", "15": "Furman", "16": "Siena"}},
+    {name:"YNOT3",picks:{"1": "Arizona", "2": "Iowa State", "3": "Illinois", "4": "Kansas", "5": "Wisconsin", "6": "BYU", "7": "Miami FL", "8": "Clemson", "9": "TCU", "10": "UCF", "11": "South Florida", "12": "Akron", "13": "Hofstra", "14": "Wright State", "15": "Furman", "16": "Prairie View AM"}},
+    {name:"ZABBY1",picks:{"1": "Duke", "2": "UCONN", "3": "Gonzaga", "4": "Kansas", "5": "Wisconsin", "6": "Louisville", "7": "Miami FL", "8": "Georgia", "9": "Iowa", "10": "Texas AM", "11": "VCU", "12": "Akron", "13": "Hofstra", "14": "North Dakota State", "15": "Idaho", "16": "Prairie View AM"}},
+    {name:"ZABBY2",picks:{"1": "Arizona", "2": "Houston", "3": "Illinois", "4": "Arkansas", "5": "St Johns", "6": "Louisville", "7": "Kentucky", "8": "Ohio State", "9": "Saint Louis", "10": "UCF", "11": "VCU", "12": "Akron", "13": "Troy", "14": "Wright State", "15": "Queens", "16": "Howard"}},
+  ],
+  "100": [
+    {name:"3 Putt City",picks:{"1": "Michigan", "2": "Houston", "3": "Michigan St", "4": "Arkansas", "5": "St Johns", "6": "Tennessee", "7": "UCLA", "8": "Villanova", "9": "Iowa", "10": "Santa Clara", "11": "VCU", "12": "Akron", "13": "Hofstra", "14": "U Penn", "15": "Furman", "16": "LIU"}},
+    {name:"3dogsonarug",picks:{"1": "Duke", "2": "Purdue", "3": "Illinois", "4": "Alabama", "5": "St Johns", "6": "Tennessee", "7": "UCLA", "8": "Georgia", "9": "Iowa", "10": "Missouri", "11": "VCU", "12": "McNeese", "13": "Hawaii", "14": "Kennesaw St", "15": "Furman", "16": "Prairie View AM"}},
+    {name:"9th Year of Eligibility",picks:{"1": "Duke", "2": "Purdue", "3": "Michigan St", "4": "Arkansas", "5": "St Johns", "6": "Louisville", "7": "Kentucky", "8": "Clemson", "9": "TCU", "10": "Texas AM", "11": "VCU", "12": "High Point", "13": "Hofstra", "14": "Kennesaw St", "15": "Queens", "16": "LIU"}},
+    {name:"adam235",picks:{"1": "Arizona", "2": "Houston", "3": "Virginia", "4": "Arkansas", "5": "Vanderbilt", "6": "Louisville", "7": "Kentucky", "8": "Georgia", "9": "TCU", "10": "Missouri", "11": "VCU", "12": "Akron", "13": "California Baptist", "14": "North Dakota State", "15": "Furman", "16": "Howard"}},
+    {name:"Alex G",picks:{"1": "Florida", "2": "Iowa State", "3": "Illinois", "4": "Arkansas", "5": "St Johns", "6": "Tennessee", "7": "UCLA", "8": "Ohio State", "9": "Iowa", "10": "Missouri", "11": "VCU", "12": "Akron", "13": "Hofstra", "14": "North Dakota State", "15": "Furman", "16": "LIU"}},
+    {name:"Andy Greenberg",picks:{"1": "Arizona", "2": "Iowa State", "3": "Illinois", "4": "Kansas", "5": "Vanderbilt", "6": "Tennessee", "7": "UCLA", "8": "Ohio State", "9": "Iowa", "10": "Missouri", "11": "VCU", "12": "Akron", "13": "Hofstra", "14": "North Dakota State", "15": "Furman", "16": "Prairie View AM"}},
+    {name:"Angie Vegas",picks:{"1": "Arizona", "2": "Iowa State", "3": "Illinois", "4": "Arkansas", "5": "St Johns", "6": "BYU", "7": "UCLA", "8": "Georgia", "9": "Iowa", "10": "Santa Clara", "11": "Miami OH", "12": "High Point", "13": "Hofstra", "14": "Wright State", "15": "Furman", "16": "Howard"}},
+    {name:"B pags",picks:{"1": "Arizona", "2": "Iowa State", "3": "Gonzaga", "4": "Alabama", "5": "St Johns", "6": "Louisville", "7": "Saint Mary's", "8": "Ohio State", "9": "Iowa", "10": "Texas AM", "11": "VCU", "12": "Northern Iowa", "13": "Hofstra", "14": "North Dakota State", "15": "Tennessee State", "16": "Siena"}},
+    {name:"Bear Down Bay-Be!!!",picks:{"1": "Arizona", "2": "Houston", "3": "Virginia", "4": "Alabama", "5": "St Johns", "6": "North Carolina", "7": "Miami FL", "8": "Clemson", "9": "Saint Louis", "10": "UCF", "11": "Texas", "12": "High Point", "13": "Hofstra", "14": "Kennesaw St", "15": "Queens", "16": "Howard"}},
+    {name:"Bear Down Bay-Be!!! 2",picks:{"1": "Arizona", "2": "Iowa State", "3": "Michigan St", "4": "Kansas", "5": "Wisconsin", "6": "BYU", "7": "Saint Mary's", "8": "Ohio State", "9": "Utah State", "10": "Texas AM", "11": "VCU", "12": "McNeese", "13": "Hawaii", "14": "U Penn", "15": "Furman", "16": "Prairie View AM"}},
+    {name:"Bibi Satanyahu",picks:{"1": "Arizona", "2": "Houston", "3": "Michigan St", "4": "Alabama", "5": "Vanderbilt", "6": "Tennessee", "7": "Miami FL", "8": "Georgia", "9": "TCU", "10": "Santa Clara", "11": "South Florida", "12": "High Point", "13": "Troy", "14": "North Dakota State", "15": "Furman", "16": "Siena"}},
+    {name:"Big Al Tep",picks:{"1": "Arizona", "2": "Iowa State", "3": "Michigan St", "4": "Arkansas", "5": "St Johns", "6": "BYU", "7": "Saint Mary's", "8": "Ohio State", "9": "Utah State", "10": "Santa Clara", "11": "South Florida", "12": "Akron", "13": "Troy", "14": "Kennesaw St", "15": "Furman", "16": "Howard"}},
+    {name:"Big Cat 1",picks:{"1": "Michigan", "2": "UCONN", "3": "Gonzaga", "4": "Arkansas", "5": "Vanderbilt", "6": "North Carolina", "7": "Saint Mary's", "8": "Clemson", "9": "TCU", "10": "Santa Clara", "11": "South Florida", "12": "Akron", "13": "Hofstra", "14": "North Dakota State", "15": "Queens", "16": "Siena"}},
+    {name:"Big Cat 10",picks:{"1": "Arizona", "2": "Iowa State", "3": "Gonzaga", "4": "Kansas", "5": "Vanderbilt", "6": "Tennessee", "7": "Saint Mary's", "8": "Ohio State", "9": "Saint Louis", "10": "UCF", "11": "VCU", "12": "Northern Iowa", "13": "Hofstra", "14": "North Dakota State", "15": "Queens", "16": "Siena"}},
+    {name:"Big Cat 2",picks:{"1": "Michigan", "2": "Houston", "3": "Gonzaga", "4": "Arkansas", "5": "St Johns", "6": "Tennessee", "7": "UCLA", "8": "Clemson", "9": "Utah State", "10": "Santa Clara", "11": "South Florida", "12": "Akron", "13": "California Baptist", "14": "North Dakota State", "15": "Queens", "16": "Siena"}},
+    {name:"Big Cat 3",picks:{"1": "Michigan", "2": "UCONN", "3": "Gonzaga", "4": "Kansas", "5": "Vanderbilt", "6": "Tennessee", "7": "Saint Mary's", "8": "Clemson", "9": "Utah State", "10": "Missouri", "11": "Texas", "12": "High Point", "13": "Troy", "14": "North Dakota State", "15": "Queens", "16": "Siena"}},
+    {name:"Big Cat 4",picks:{"1": "Michigan", "2": "Houston", "3": "Gonzaga", "4": "Kansas", "5": "Wisconsin", "6": "Tennessee", "7": "UCLA", "8": "Clemson", "9": "Utah State", "10": "Texas AM", "11": "South Florida", "12": "Akron", "13": "Hofstra", "14": "North Dakota State", "15": "Queens", "16": "Siena"}},
+    {name:"Big Cat 5",picks:{"1": "Michigan", "2": "UCONN", "3": "Gonzaga", "4": "Arkansas", "5": "Vanderbilt", "6": "North Carolina", "7": "Saint Mary's", "8": "Ohio State", "9": "Iowa", "10": "Santa Clara", "11": "South Florida", "12": "Akron", "13": "Troy", "14": "North Dakota State", "15": "Queens", "16": "Siena"}},
+    {name:"Big Cat 6",picks:{"1": "Michigan", "2": "UCONN", "3": "Gonzaga", "4": "Arkansas", "5": "Vanderbilt", "6": "North Carolina", "7": "Kentucky", "8": "Clemson", "9": "TCU", "10": "Missouri", "11": "South Florida", "12": "Akron", "13": "Hofstra", "14": "North Dakota State", "15": "Queens", "16": "Siena"}},
+    {name:"Big Cat 7",picks:{"1": "Michigan", "2": "Houston", "3": "Gonzaga", "4": "Kansas", "5": "Wisconsin", "6": "Tennessee", "7": "Kentucky", "8": "Clemson", "9": "TCU", "10": "UCF", "11": "VCU", "12": "Northern Iowa", "13": "Troy", "14": "North Dakota State", "15": "Queens", "16": "Siena"}},
+    {name:"Big Cat 8",picks:{"1": "Arizona", "2": "Houston", "3": "Gonzaga", "4": "Alabama", "5": "St Johns", "6": "Tennessee", "7": "Kentucky", "8": "Ohio State", "9": "Iowa", "10": "UCF", "11": "South Florida", "12": "High Point", "13": "California Baptist", "14": "North Dakota State", "15": "Queens", "16": "Siena"}},
+    {name:"Big Cat 9",picks:{"1": "Arizona", "2": "UCONN", "3": "Virginia", "4": "Alabama", "5": "Vanderbilt", "6": "North Carolina", "7": "Miami FL", "8": "Georgia", "9": "TCU", "10": "Texas AM", "11": "Texas", "12": "High Point", "13": "California Baptist", "14": "North Dakota State", "15": "Queens", "16": "Siena"}},
+    {name:"Brian McAllister 5",picks:{"1": "Michigan", "2": "Purdue", "3": "Illinois", "4": "Nebraska", "5": "St Johns", "6": "BYU", "7": "Saint Mary's", "8": "Ohio State", "9": "Iowa", "10": "Santa Clara", "11": "VCU", "12": "Akron", "13": "California Baptist", "14": "Wright State", "15": "Tennessee State", "16": "LIU"}},
+    {name:"Briano",picks:{"1": "Arizona", "2": "Iowa State", "3": "Gonzaga", "4": "Alabama", "5": "Vanderbilt", "6": "Tennessee", "7": "UCLA", "8": "Ohio State", "9": "Utah State", "10": "Missouri", "11": "South Florida", "12": "Akron", "13": "Hofstra", "14": "North Dakota State", "15": "Idaho", "16": "Howard"}},
+    {name:"Briano",picks:{"1": "Arizona", "2": "Houston", "3": "Virginia", "4": "Arkansas", "5": "St Johns", "6": "Tennessee", "7": "UCLA", "8": "Georgia", "9": "Utah State", "10": "Missouri", "11": "VCU", "12": "Akron", "13": "Hofstra", "14": "North Dakota State", "15": "Idaho", "16": "Howard"}},
+    {name:"BuckyBall",picks:{"1": "Arizona", "2": "Houston", "3": "Michigan St", "4": "Nebraska", "5": "St Johns", "6": "Tennessee", "7": "UCLA", "8": "Georgia", "9": "Iowa", "10": "Santa Clara", "11": "Texas", "12": "Akron", "13": "Hofstra", "14": "Wright State", "15": "Queens", "16": "Siena"}},
+    {name:"CAlba3",picks:{"1": "Michigan", "2": "Houston", "3": "Michigan St", "4": "Arkansas", "5": "St Johns", "6": "Tennessee", "7": "Miami FL", "8": "Ohio State", "9": "Iowa", "10": "Santa Clara", "11": "South Florida", "12": "High Point", "13": "Hofstra", "14": "Wright State", "15": "Queens", "16": "Siena"}},
+    {name:"CBV",picks:{"1": "Arizona", "2": "UCONN", "3": "Gonzaga", "4": "Arkansas", "5": "Texas Tech", "6": "Tennessee", "7": "Kentucky", "8": "Georgia", "9": "TCU", "10": "Texas AM", "11": "VCU", "12": "McNeese", "13": "Hofstra", "14": "U Penn", "15": "Queens", "16": "Prairie View AM"}},
+    {name:"CDOJ",picks:{"1": "Michigan", "2": "UCONN", "3": "Virginia", "4": "Kansas", "5": "Wisconsin", "6": "Louisville", "7": "Miami FL", "8": "Clemson", "9": "Utah State", "10": "Santa Clara", "11": "VCU", "12": "McNeese", "13": "Hofstra", "14": "Kennesaw St", "15": "Idaho", "16": "Siena"}},
+    {name:"Cdubs",picks:{"1": "Michigan", "2": "UCONN", "3": "Gonzaga", "4": "Kansas", "5": "Wisconsin", "6": "Louisville", "7": "Kentucky", "8": "Georgia", "9": "TCU", "10": "UCF", "11": "NC State/Texas Winner", "12": "High Point", "13": "California Baptist", "14": "North Dakota State", "15": "Queens", "16": "Prairie View AM"}},
+    {name:"CNOTE1",picks:{"1": "Arizona", "2": "Houston", "3": "Michigan St", "4": "Arkansas", "5": "St Johns", "6": "Tennessee", "7": "UCLA", "8": "Georgia", "9": "Iowa", "10": "Missouri", "11": "Texas", "12": "Akron", "13": "Hofstra", "14": "Kennesaw St", "15": "Furman", "16": "Howard"}},
+    {name:"CNOTE2",picks:{"1": "Duke", "2": "Iowa State", "3": "Gonzaga", "4": "Kansas", "5": "Vanderbilt", "6": "Louisville", "7": "Saint Mary's", "8": "Georgia", "9": "Utah State", "10": "Texas AM", "11": "VCU", "12": "Akron", "13": "Hofstra", "14": "North Dakota State", "15": "Idaho", "16": "Prairie View AM"}},
+    {name:"CNOTE3",picks:{"1": "Florida", "2": "Purdue", "3": "Illinois", "4": "Alabama", "5": "Wisconsin", "6": "Tennessee", "7": "Saint Mary's", "8": "Ohio State", "9": "TCU", "10": "Santa Clara", "11": "South Florida", "12": "Northern Iowa", "13": "Troy", "14": "North Dakota State", "15": "Tennessee State", "16": "Siena"}},
+    {name:"CNOTE4",picks:{"1": "Michigan", "2": "Houston", "3": "Michigan St", "4": "Arkansas", "5": "Vanderbilt", "6": "BYU", "7": "UCLA", "8": "Ohio State", "9": "Iowa", "10": "Missouri", "11": "SMU/Miami OH Winner", "12": "Akron", "13": "California Baptist", "14": "Wright State", "15": "Furman", "16": "LIU"}},
+    {name:"CNOTE5",picks:{"1": "Duke", "2": "Purdue", "3": "Michigan St", "4": "Kansas", "5": "St Johns", "6": "Tennessee", "7": "Kentucky", "8": "Ohio State", "9": "Utah State", "10": "Santa Clara", "11": "Texas", "12": "Akron", "13": "Hawaii", "14": "North Dakota State", "15": "Queens", "16": "Howard"}},
+    {name:"Custodian Johnny",picks:{"1": "Arizona", "2": "UCONN", "3": "Illinois", "4": "Arkansas", "5": "St Johns", "6": "Tennessee", "7": "Kentucky", "8": "Georgia", "9": "TCU", "10": "Texas AM", "11": "Texas", "12": "High Point", "13": "Hofstra", "14": "Wright State", "15": "Furman", "16": "LIU"}},
+    {name:"CWalkdahawk",picks:{"1": "Arizona", "2": "Iowa State", "3": "Illinois", "4": "Nebraska", "5": "Texas Tech", "6": "BYU", "7": "Miami FL", "8": "Georgia", "9": "Iowa", "10": "Missouri", "11": "SMU/Miami OH Winner", "12": "Northern Iowa", "13": "Hofstra", "14": "U Penn", "15": "Tennessee State", "16": "Howard"}},
+    {name:"Dantedan 5",picks:{"1": "Duke", "2": "Houston", "3": "Virginia", "4": "Arkansas", "5": "Texas Tech", "6": "North Carolina", "7": "Miami FL", "8": "Ohio State", "9": "Iowa", "10": "Santa Clara", "11": "VCU", "12": "Akron", "13": "Troy", "14": "U Penn", "15": "Tennessee State", "16": "Siena"}},
+    {name:"Dantedan1",picks:{"1": "Michigan", "2": "Houston", "3": "Michigan St", "4": "Arkansas", "5": "St Johns", "6": "BYU", "7": "Miami FL", "8": "Ohio State", "9": "Utah State", "10": "Santa Clara", "11": "VCU", "12": "Akron", "13": "Hofstra", "14": "Wright State", "15": "Tennessee State", "16": "Siena"}},
+    {name:"Dantedan2",picks:{"1": "Arizona", "2": "Purdue", "3": "Illinois", "4": "Arkansas", "5": "Texas Tech", "6": "BYU", "7": "Saint Mary's", "8": "Clemson", "9": "Utah State", "10": "Santa Clara", "11": "South Florida", "12": "McNeese", "13": "Hofstra", "14": "Kennesaw St", "15": "Queens", "16": "Howard"}},
+    {name:"Dantedan3",picks:{"1": "Florida", "2": "Iowa State", "3": "Michigan St", "4": "Arkansas", "5": "St Johns", "6": "BYU", "7": "Kentucky", "8": "Villanova", "9": "Saint Louis", "10": "Texas AM", "11": "South Florida", "12": "McNeese", "13": "Troy", "14": "North Dakota State", "15": "Furman", "16": "Howard"}},
+    {name:"Dantedan4",picks:{"1": "Arizona", "2": "Houston", "3": "Virginia", "4": "Alabama", "5": "Vanderbilt", "6": "BYU", "7": "Miami FL", "8": "Clemson", "9": "Iowa", "10": "UCF", "11": "South Florida", "12": "High Point", "13": "Troy", "14": "U Penn", "15": "Queens", "16": "Howard"}},
+    {name:"Dave Grob 1",picks:{"1": "Arizona", "2": "Houston", "3": "Virginia", "4": "Alabama", "5": "Vanderbilt", "6": "BYU", "7": "UCLA", "8": "Clemson", "9": "Saint Louis", "10": "Santa Clara", "11": "VCU", "12": "High Point", "13": "Troy", "14": "Kennesaw St", "15": "Furman", "16": "Howard"}},
+    {name:"Dave Grob 2",picks:{"1": "Duke", "2": "Iowa State", "3": "Illinois", "4": "Arkansas", "5": "Wisconsin", "6": "Louisville", "7": "Saint Mary's", "8": "Ohio State", "9": "Utah State", "10": "Santa Clara", "11": "VCU", "12": "High Point", "13": "Troy", "14": "Kennesaw St", "15": "Furman", "16": "Howard"}},
+    {name:"Delilah",picks:{"1": "Arizona", "2": "Houston", "3": "Michigan St", "4": "Alabama", "5": "Vanderbilt", "6": "Tennessee", "7": "Miami FL", "8": "Ohio State", "9": "Iowa", "10": "UCF", "11": "VCU", "12": "Akron", "13": "Troy", "14": "Wright State", "15": "Furman", "16": "Prairie View AM"}},
+    {name:"Dirt McGirt",picks:{"1": "Duke", "2": "Houston", "3": "Virginia", "4": "Arkansas", "5": "St Johns", "6": "North Carolina", "7": "Kentucky", "8": "Georgia", "9": "Iowa", "10": "UCF", "11": "South Florida", "12": "Akron", "13": "Hofstra", "14": "Kennesaw St", "15": "Queens", "16": "LIU"}},
+    {name:"Dk",picks:{"1": "Duke", "2": "Houston", "3": "Virginia", "4": "Arkansas", "5": "Vanderbilt", "6": "Tennessee", "7": "UCLA", "8": "Clemson", "9": "Utah State", "10": "Missouri", "11": "VCU", "12": "High Point", "13": "Hawaii", "14": "Wright State", "15": "Furman", "16": "Siena"}},
+    {name:"Dorseynation",picks:{"1": "Michigan", "2": "Houston", "3": "Gonzaga", "4": "Arkansas", "5": "St Johns", "6": "Tennessee", "7": "UCLA", "8": "Clemson", "9": "Iowa", "10": "Missouri", "11": "Texas", "12": "High Point", "13": "Hofstra", "14": "U Penn", "15": "Queens", "16": "Siena"}},
+    {name:"Dr Ryder",picks:{"1": "Michigan", "2": "Houston", "3": "Michigan St", "4": "Arkansas", "5": "St Johns", "6": "BYU", "7": "Saint Mary's", "8": "Ohio State", "9": "Iowa", "10": "UCF", "11": "VCU", "12": "Akron", "13": "Hofstra", "14": "Kennesaw St", "15": "Queens", "16": "LIU"}},
+    {name:"Elliot Duffy",picks:{"1": "Florida", "2": "UCONN", "3": "Gonzaga", "4": "Kansas", "5": "St Johns", "6": "Louisville", "7": "Saint Mary's", "8": "Villanova", "9": "Saint Louis", "10": "UCF", "11": "VCU", "12": "High Point", "13": "Hofstra", "14": "U Penn", "15": "Idaho", "16": "LIU"}},
+    {name:"Elliot Duffy 2",picks:{"1": "Duke", "2": "Houston", "3": "Gonzaga", "4": "Arkansas", "5": "St Johns", "6": "BYU", "7": "Saint Mary's", "8": "Villanova", "9": "Saint Louis", "10": "Missouri", "11": "VCU", "12": "Akron", "13": "California Baptist", "14": "Wright State", "15": "Queens", "16": "Howard"}},
+    {name:"Eloise",picks:{"1": "Duke", "2": "Houston", "3": "Gonzaga", "4": "Nebraska", "5": "St Johns", "6": "North Carolina", "7": "Kentucky", "8": "Clemson", "9": "TCU", "10": "Missouri", "11": "South Florida", "12": "McNeese", "13": "Hofstra", "14": "Wright State", "15": "Idaho", "16": "Prairie View AM"}},
+    {name:"Friars",picks:{"1": "Florida", "2": "Iowa State", "3": "Gonzaga", "4": "Nebraska", "5": "St Johns", "6": "Louisville", "7": "Miami FL", "8": "Georgia", "9": "TCU", "10": "Texas AM", "11": "VCU", "12": "High Point", "13": "Hofstra", "14": "U Penn", "15": "Tennessee State", "16": "LIU"}},
+    {name:"Gagoots",picks:{"1": "Michigan", "2": "Purdue", "3": "Virginia", "4": "Arkansas", "5": "Wisconsin", "6": "Tennessee", "7": "UCLA", "8": "Ohio State", "9": "TCU", "10": "UCF", "11": "Texas", "12": "Akron", "13": "Troy", "14": "Kennesaw St", "15": "Tennessee State", "16": "LIU"}},
+    {name:"Gamblord1",picks:{"1": "Arizona", "2": "Iowa State", "3": "Illinois", "4": "Arkansas", "5": "St Johns", "6": "Tennessee", "7": "Kentucky", "8": "Ohio State", "9": "Iowa", "10": "Santa Clara", "11": "Texas", "12": "Northern Iowa", "13": "Hofstra", "14": "Kennesaw St", "15": "Idaho", "16": "Howard"}},
+    {name:"Gamblord2",picks:{"1": "Duke", "2": "Houston", "3": "Gonzaga", "4": "Arkansas", "5": "Vanderbilt", "6": "Tennessee", "7": "UCLA", "8": "Ohio State", "9": "Iowa", "10": "Missouri", "11": "Texas", "12": "Northern Iowa", "13": "Hofstra", "14": "Kennesaw St", "15": "Idaho", "16": "Howard"}},
+    {name:"Gamblord3",picks:{"1": "Michigan", "2": "Purdue", "3": "Illinois", "4": "Arkansas", "5": "St Johns", "6": "Louisville", "7": "UCLA", "8": "Ohio State", "9": "Iowa", "10": "Missouri", "11": "Texas", "12": "Northern Iowa", "13": "Hofstra", "14": "North Dakota State", "15": "Tennessee State", "16": "Howard"}},
+    {name:"Gamblord4",picks:{"1": "Michigan", "2": "Purdue", "3": "Michigan St", "4": "Arkansas", "5": "Vanderbilt", "6": "Louisville", "7": "UCLA", "8": "Ohio State", "9": "Iowa", "10": "Missouri", "11": "Texas", "12": "Northern Iowa", "13": "Hofstra", "14": "Kennesaw St", "15": "Idaho", "16": "Howard"}},
+    {name:"Gamblord5",picks:{"1": "Arizona", "2": "Houston", "3": "Illinois", "4": "Arkansas", "5": "Wisconsin", "6": "Tennessee", "7": "Kentucky", "8": "Ohio State", "9": "Iowa", "10": "Santa Clara", "11": "Texas", "12": "Northern Iowa", "13": "Hofstra", "14": "North Dakota State", "15": "Tennessee State", "16": "Howard"}},
+    {name:"Gdeets",picks:{"1": "Arizona", "2": "Houston", "3": "Michigan St", "4": "Arkansas", "5": "Vanderbilt", "6": "BYU", "7": "Saint Mary's", "8": "Ohio State", "9": "Saint Louis", "10": "Santa Clara", "11": "VCU", "12": "Northern Iowa", "13": "Hofstra", "14": "Wright State", "15": "Furman", "16": "Siena"}},
+    {name:"Glutton State",picks:{"1": "Arizona", "2": "Iowa State", "3": "Michigan St", "4": "Arkansas", "5": "Vanderbilt", "6": "Tennessee", "7": "UCLA", "8": "Georgia", "9": "TCU", "10": "Missouri", "11": "Texas", "12": "Akron", "13": "Hofstra", "14": "Wright State", "15": "Furman", "16": "Howard"}},
+    {name:"grossi 1",picks:{"1": "Michigan", "2": "Houston", "3": "Virginia", "4": "Kansas", "5": "Wisconsin", "6": "BYU", "7": "UCLA", "8": "Clemson", "9": "Utah State", "10": "Santa Clara", "11": "VCU", "12": "Akron", "13": "Troy", "14": "U Penn", "15": "Tennessee State", "16": "LIU"}},
+    {name:"grossi 2",picks:{"1": "Arizona", "2": "Iowa State", "3": "Illinois", "4": "Arkansas", "5": "St Johns", "6": "Tennessee", "7": "Miami FL", "8": "Ohio State", "9": "Iowa", "10": "Texas AM", "11": "South Florida", "12": "High Point", "13": "Troy", "14": "Wright State", "15": "Furman", "16": "Siena"}},
+    {name:"Grundle",picks:{"1": "Duke", "2": "Houston", "3": "Gonzaga", "4": "Alabama", "5": "St Johns", "6": "Tennessee", "7": "Kentucky", "8": "Villanova", "9": "Iowa", "10": "Texas AM", "11": "Texas", "12": "McNeese", "13": "Hawaii", "14": "North Dakota State", "15": "Queens", "16": "Howard"}},
+    {name:"Harvs 10",picks:{"1": "Florida", "2": "Iowa State", "3": "Michigan St", "4": "Arkansas", "5": "St Johns", "6": "North Carolina", "7": "Miami FL", "8": "Georgia", "9": "TCU", "10": "Santa Clara", "11": "South Florida", "12": "Akron", "13": "Hofstra", "14": "U Penn", "15": "Furman", "16": "Siena"}},
+    {name:"Harvs 6",picks:{"1": "Michigan", "2": "Purdue", "3": "Illinois", "4": "Kansas", "5": "St Johns", "6": "Tennessee", "7": "UCLA", "8": "Ohio State", "9": "Utah State", "10": "UCF", "11": "VCU", "12": "McNeese", "13": "Troy", "14": "North Dakota State", "15": "Tennessee State", "16": "Howard"}},
+    {name:"Harvs 7",picks:{"1": "Duke", "2": "Purdue", "3": "Illinois", "4": "Alabama", "5": "St Johns", "6": "BYU", "7": "Miami FL", "8": "Villanova", "9": "Iowa", "10": "Texas AM", "11": "Texas", "12": "Akron", "13": "California Baptist", "14": "Wright State", "15": "Furman", "16": "LIU"}},
+    {name:"Harvs 8",picks:{"1": "Arizona", "2": "UCONN", "3": "Gonzaga", "4": "Nebraska", "5": "Wisconsin", "6": "North Carolina", "7": "Saint Mary's", "8": "Ohio State", "9": "Saint Louis", "10": "Santa Clara", "11": "SMU/Miami OH Winner", "12": "McNeese", "13": "Hawaii", "14": "Wright State", "15": "Queens", "16": "Howard"}},
+    {name:"Harvs 9",picks:{"1": "Duke", "2": "Houston", "3": "Illinois", "4": "Nebraska", "5": "Vanderbilt", "6": "Tennessee", "7": "Saint Mary's", "8": "Ohio State", "9": "Utah State", "10": "Santa Clara", "11": "Texas", "12": "Akron", "13": "Hofstra", "14": "North Dakota State", "15": "Idaho", "16": "Howard"}},
+    {name:"HENGEN2",picks:{"1": "Michigan", "2": "Houston", "3": "Illinois", "4": "Arkansas", "5": "Vanderbilt", "6": "Tennessee", "7": "UCLA", "8": "Ohio State", "9": "Iowa", "10": "Missouri", "11": "Texas", "12": "Akron", "13": "Troy", "14": "North Dakota State", "15": "Furman", "16": "LIU"}},
+    {name:"JackTheRipper",picks:{"1": "Arizona", "2": "Houston", "3": "Illinois", "4": "Arkansas", "5": "Vanderbilt", "6": "BYU", "7": "UCLA", "8": "Ohio State", "9": "Utah State", "10": "Santa Clara", "11": "South Florida", "12": "High Point", "13": "Hawaii", "14": "U Penn", "15": "Tennessee State", "16": "Siena"}},
+    {name:"JannaChuk",picks:{"1": "Arizona", "2": "Houston", "3": "Illinois", "4": "Alabama", "5": "Vanderbilt", "6": "BYU", "7": "UCLA", "8": "Georgia", "9": "TCU", "10": "Missouri", "11": "South Florida", "12": "Akron", "13": "Hofstra", "14": "North Dakota State", "15": "Tennessee State", "16": "Prairie View AM"}},
+    {name:"JenCohen1",picks:{"1": "Michigan", "2": "Houston", "3": "Illinois", "4": "Kansas", "5": "Wisconsin", "6": "Tennessee", "7": "UCLA", "8": "Clemson", "9": "Utah State", "10": "Santa Clara", "11": "South Florida", "12": "Akron", "13": "Troy", "14": "Kennesaw St", "15": "Queens", "16": "Siena"}},
+    {name:"JenCohen2",picks:{"1": "Arizona", "2": "Houston", "3": "Illinois", "4": "Arkansas", "5": "Vanderbilt", "6": "BYU", "7": "UCLA", "8": "Ohio State", "9": "Saint Louis", "10": "Missouri", "11": "South Florida", "12": "Northern Iowa", "13": "Hofstra", "14": "Wright State", "15": "Queens", "16": "Prairie View AM"}},
+    {name:"JHM617",picks:{"1": "Arizona", "2": "Iowa State", "3": "Illinois", "4": "Arkansas", "5": "Vanderbilt", "6": "BYU", "7": "UCLA", "8": "Ohio State", "9": "Iowa", "10": "Missouri", "11": "South Florida", "12": "Akron", "13": "Troy", "14": "North Dakota State", "15": "Furman", "16": "Howard"}},
+    {name:"JHMDFM",picks:{"1": "Arizona", "2": "Houston", "3": "Michigan St", "4": "Nebraska", "5": "St Johns", "6": "BYU", "7": "UCLA", "8": "Ohio State", "9": "Saint Louis", "10": "Santa Clara", "11": "SMU/Miami OH Winner", "12": "High Point", "13": "Hofstra", "14": "Kennesaw St", "15": "Queens", "16": "Prairie View AM"}},
+    {name:"Jimmy Chun",picks:{"1": "Arizona", "2": "Houston", "3": "Michigan St", "4": "Arkansas", "5": "St Johns", "6": "Tennessee", "7": "UCLA", "8": "Ohio State", "9": "Saint Louis", "10": "Santa Clara", "11": "VCU", "12": "Akron", "13": "Troy", "14": "Kennesaw St", "15": "Queens", "16": "Prairie View AM"}},
+    {name:"JLOU",picks:{"1": "Arizona", "2": "Houston", "3": "Michigan St", "4": "Kansas", "5": "Vanderbilt", "6": "BYU", "7": "UCLA", "8": "Ohio State", "9": "Iowa", "10": "Santa Clara", "11": "South Florida", "12": "Akron", "13": "Troy", "14": "U Penn", "15": "Furman", "16": "Howard"}},
+    {name:"JMO",picks:{"1": "Florida", "2": "Purdue", "3": "Michigan St", "4": "Kansas", "5": "Wisconsin", "6": "North Carolina", "7": "Kentucky", "8": "Ohio State", "9": "Utah State", "10": "Texas AM", "11": "Texas", "12": "Akron", "13": "Troy", "14": "North Dakota State", "15": "Tennessee State", "16": "Prairie View AM"}},
+    {name:"Joe Clark-1",picks:{"1": "Michigan", "2": "Iowa State", "3": "Michigan St", "4": "Nebraska", "5": "St Johns", "6": "Tennessee", "7": "UCLA", "8": "Ohio State", "9": "Iowa", "10": "Santa Clara", "11": "VCU", "12": "High Point", "13": "Hofstra", "14": "U Penn", "15": "Furman", "16": "Howard"}},
+    {name:"Joe Clark-2",picks:{"1": "Arizona", "2": "Iowa State", "3": "Virginia", "4": "Arkansas", "5": "St Johns", "6": "Tennessee", "7": "UCLA", "8": "Ohio State", "9": "Utah State", "10": "Santa Clara", "11": "South Florida", "12": "Akron", "13": "Hofstra", "14": "U Penn", "15": "Queens", "16": "Siena"}},
+    {name:"Joe Cohen 1",picks:{"1": "Michigan", "2": "Houston", "3": "Michigan St", "4": "Arkansas", "5": "St Johns", "6": "Tennessee", "7": "UCLA", "8": "Clemson", "9": "TCU", "10": "Missouri", "11": "VCU", "12": "Akron", "13": "Troy", "14": "Wright State", "15": "Queens", "16": "Prairie View AM"}},
+    {name:"Joe Cohen 2",picks:{"1": "Duke", "2": "Iowa State", "3": "Illinois", "4": "Arkansas", "5": "Vanderbilt", "6": "BYU", "7": "UCLA", "8": "Villanova", "9": "Saint Louis", "10": "Missouri", "11": "VCU", "12": "Akron", "13": "Hofstra", "14": "North Dakota State", "15": "Queens", "16": "Howard"}},
+    {name:"Johnnies",picks:{"1": "Arizona", "2": "UCONN", "3": "Virginia", "4": "Nebraska", "5": "St Johns", "6": "Louisville", "7": "UCLA", "8": "Georgia", "9": "TCU", "10": "Texas AM", "11": "VCU", "12": "High Point", "13": "Hofstra", "14": "Kennesaw St", "15": "Tennessee State", "16": "LIU"}},
+    {name:"Johnny the Heat1",picks:{"1": "Michigan", "2": "Houston", "3": "Michigan St", "4": "Arkansas", "5": "Vanderbilt", "6": "Tennessee", "7": "Miami FL", "8": "Ohio State", "9": "Iowa", "10": "UCF", "11": "SMU/Miami OH Winner", "12": "Northern Iowa", "13": "Hofstra", "14": "U Penn", "15": "Tennessee State", "16": "LIU"}},
+    {name:"JordanKatz2",picks:{"1": "Arizona", "2": "Houston", "3": "Illinois", "4": "Arkansas", "5": "Vanderbilt", "6": "Tennessee", "7": "Kentucky", "8": "Ohio State", "9": "Utah State", "10": "Texas AM", "11": "NC State/Texas Winner", "12": "High Point", "13": "Troy", "14": "U Penn", "15": "Queens", "16": "Siena"}},
+    {name:"Joshuahorvath1",picks:{"1": "Arizona", "2": "Iowa State", "3": "Illinois", "4": "Arkansas", "5": "Vanderbilt", "6": "Louisville", "7": "UCLA", "8": "Clemson", "9": "TCU", "10": "Santa Clara", "11": "VCU", "12": "High Point", "13": "Troy", "14": "North Dakota State", "15": "Furman", "16": "Prairie View AM"}},
+    {name:"JP Gallo",picks:{"1": "Michigan", "2": "Houston", "3": "Michigan St", "4": "Arkansas", "5": "St Johns", "6": "BYU", "7": "Saint Mary's", "8": "Ohio State", "9": "Saint Louis", "10": "Missouri", "11": "South Florida", "12": "McNeese", "13": "Hofstra", "14": "U Penn", "15": "Furman", "16": "Siena"}},
+    {name:"JP1",picks:{"1": "Arizona", "2": "Houston", "3": "Michigan St", "4": "Arkansas", "5": "Vanderbilt", "6": "Tennessee", "7": "UCLA", "8": "Ohio State", "9": "Utah State", "10": "Santa Clara", "11": "South Florida", "12": "Akron", "13": "Troy", "14": "Wright State", "15": "Furman", "16": "Howard"}},
+    {name:"Jrey",picks:{"1": "Michigan", "2": "Purdue", "3": "Michigan St", "4": "Nebraska", "5": "St Johns", "6": "BYU", "7": "Kentucky", "8": "Ohio State", "9": "Iowa", "10": "Texas AM", "11": "SMU/Miami OH Winner", "12": "Akron", "13": "California Baptist", "14": "U Penn", "15": "Idaho", "16": "LIU"}},
+    {name:"Jrey #2",picks:{"1": "Michigan", "2": "Purdue", "3": "Illinois", "4": "Alabama", "5": "St Johns", "6": "BYU", "7": "UCLA", "8": "Clemson", "9": "Utah State", "10": "Texas AM", "11": "SMU/Miami OH Winner", "12": "High Point", "13": "Troy", "14": "Kennesaw St", "15": "Furman", "16": "LIU"}},
+    {name:"Kerri McLaughlin",picks:{"1": "Arizona", "2": "Houston", "3": "Michigan St", "4": "Arkansas", "5": "St Johns", "6": "Tennessee", "7": "UCLA", "8": "Georgia", "9": "Iowa", "10": "Santa Clara", "11": "Texas", "12": "Akron", "13": "Troy", "14": "Kennesaw St", "15": "Furman", "16": "Siena"}},
+    {name:"Kerry M",picks:{"1": "Arizona", "2": "Houston", "3": "Gonzaga", "4": "Kansas", "5": "St Johns", "6": "Tennessee", "7": "Miami FL", "8": "Clemson", "9": "TCU", "10": "Missouri", "11": "South Florida", "12": "Akron", "13": "Hofstra", "14": "Wright State", "15": "Tennessee State", "16": "Siena"}},
+    {name:"Lincoln Lam 1",picks:{"1": "Arizona", "2": "Iowa State", "3": "Michigan St", "4": "Alabama", "5": "Vanderbilt", "6": "Tennessee", "7": "Saint Mary's", "8": "Villanova", "9": "TCU", "10": "Santa Clara", "11": "Texas", "12": "Akron", "13": "Troy", "14": "Wright State", "15": "Furman", "16": "Siena"}},
+    {name:"Lincoln Lam 2",picks:{"1": "Michigan", "2": "Houston", "3": "Illinois", "4": "Arkansas", "5": "Vanderbilt", "6": "Tennessee", "7": "UCLA", "8": "Ohio State", "9": "Utah State", "10": "Missouri", "11": "VCU", "12": "Akron", "13": "Hofstra", "14": "North Dakota State", "15": "Furman", "16": "Prairie View AM"}},
+    {name:"Lincoln Lam 3",picks:{"1": "Arizona", "2": "Iowa State", "3": "Michigan St", "4": "Arkansas", "5": "St Johns", "6": "North Carolina", "7": "Kentucky", "8": "Clemson", "9": "Utah State", "10": "UCF", "11": "South Florida", "12": "McNeese", "13": "California Baptist", "14": "North Dakota State", "15": "Furman", "16": "Siena"}},
+    {name:"Lincoln Lam 4",picks:{"1": "Arizona", "2": "Houston", "3": "Michigan St", "4": "Arkansas", "5": "St Johns", "6": "Tennessee", "7": "UCLA", "8": "Georgia", "9": "TCU", "10": "Santa Clara", "11": "VCU", "12": "Akron", "13": "Hofstra", "14": "U Penn", "15": "Queens", "16": "Siena"}},
+    {name:"Lincoln Lam 5",picks:{"1": "Michigan", "2": "Iowa State", "3": "Gonzaga", "4": "Kansas", "5": "Vanderbilt", "6": "Tennessee", "7": "Miami FL", "8": "Ohio State", "9": "Iowa", "10": "Missouri", "11": "SMU/Miami OH Winner", "12": "Akron", "13": "Hofstra", "14": "Kennesaw St", "15": "Furman", "16": "Siena"}},
+    {name:"Lou D",picks:{"1": "Arizona", "2": "Iowa State", "3": "Illinois", "4": "Arkansas", "5": "St Johns", "6": "Tennessee", "7": "Saint Mary's", "8": "Clemson", "9": "Utah State", "10": "Missouri", "11": "Texas", "12": "High Point", "13": "California Baptist", "14": "Kennesaw St", "15": "Queens", "16": "Howard"}},
+    {name:"Luckman",picks:{"1": "Arizona", "2": "Iowa State", "3": "Michigan St", "4": "Kansas", "5": "Vanderbilt", "6": "BYU", "7": "UCLA", "8": "Ohio State", "9": "Iowa", "10": "Santa Clara", "11": "VCU", "12": "McNeese", "13": "Hofstra", "14": "Wright State", "15": "Furman", "16": "Prairie View AM"}},
+    {name:"Luckman2",picks:{"1": "Duke", "2": "Purdue", "3": "Illinois", "4": "Nebraska", "5": "Wisconsin", "6": "Tennessee", "7": "Saint Mary's", "8": "Georgia", "9": "Utah State", "10": "Santa Clara", "11": "SMU/Miami OH Winner", "12": "Akron", "13": "Hofstra", "14": "Wright State", "15": "Furman", "16": "Howard"}},
+    {name:"Luckman3",picks:{"1": "Michigan", "2": "Houston", "3": "Gonzaga", "4": "Arkansas", "5": "St Johns", "6": "Tennessee", "7": "UCLA", "8": "Ohio State", "9": "Utah State", "10": "Santa Clara", "11": "South Florida", "12": "McNeese", "13": "Hofstra", "14": "Wright State", "15": "Furman", "16": "Siena"}},
+    {name:"Macken",picks:{"1": "Michigan", "2": "Houston", "3": "Michigan St", "4": "Arkansas", "5": "Vanderbilt", "6": "Tennessee", "7": "Kentucky", "8": "Villanova", "9": "TCU", "10": "Texas AM", "11": "Texas", "12": "High Point", "13": "Hofstra", "14": "Wright State", "15": "Tennessee State", "16": "LIU"}},
+    {name:"magicman",picks:{"1": "Arizona", "2": "Houston", "3": "Michigan St", "4": "Kansas", "5": "St Johns", "6": "BYU", "7": "Saint Mary's", "8": "Clemson", "9": "TCU", "10": "Missouri", "11": "VCU", "12": "Akron", "13": "Hofstra", "14": "U Penn", "15": "Queens", "16": "Howard"}},
+    {name:"Matt Cohen",picks:{"1": "Duke", "2": "Iowa State", "3": "Illinois", "4": "Alabama", "5": "Wisconsin", "6": "Tennessee", "7": "Miami FL", "8": "Ohio State", "9": "Iowa", "10": "Texas AM", "11": "South Florida", "12": "Akron", "13": "Troy", "14": "Kennesaw St", "15": "Queens", "16": "Howard"}},
+    {name:"Matt Compton1",picks:{"1": "Arizona", "2": "Iowa State", "3": "Illinois", "4": "Arkansas", "5": "St Johns", "6": "Tennessee", "7": "Saint Mary's", "8": "Georgia", "9": "TCU", "10": "Santa Clara", "11": "South Florida", "12": "Akron", "13": "California Baptist", "14": "Kennesaw St", "15": "Queens", "16": "Howard"}},
+    {name:"Matt Compton2",picks:{"1": "Duke", "2": "Purdue", "3": "Michigan St", "4": "Nebraska", "5": "St Johns", "6": "BYU", "7": "Saint Mary's", "8": "Clemson", "9": "TCU", "10": "Santa Clara", "11": "South Florida", "12": "High Point", "13": "California Baptist", "14": "Kennesaw St", "15": "Tennessee State", "16": "Howard"}},
+    {name:"MGOLDY1",picks:{"1": "Duke", "2": "Purdue", "3": "Virginia", "4": "Arkansas", "5": "Vanderbilt", "6": "Louisville", "7": "Kentucky", "8": "Ohio State", "9": "Utah State", "10": "UCF", "11": "NC State/Texas Winner", "12": "Northern Iowa", "13": "California Baptist", "14": "North Dakota State", "15": "Tennessee State", "16": "Prairie View AM"}},
+    {name:"MGOLDY1",picks:{"1": "Duke", "2": "Houston", "3": "Gonzaga", "4": "Kansas", "5": "Wisconsin", "6": "Tennessee", "7": "UCLA", "8": "Ohio State", "9": "Iowa", "10": "Missouri", "11": "VCU", "12": "Northern Iowa", "13": "Hofstra", "14": "Wright State", "15": "Furman", "16": "LIU"}},
+    {name:"MGoldy2",picks:{"1": "Arizona", "2": "Houston", "3": "Gonzaga", "4": "Arkansas", "5": "St Johns", "6": "Tennessee", "7": "UCLA", "8": "Georgia", "9": "Iowa", "10": "Missouri", "11": "VCU", "12": "Akron", "13": "Hofstra", "14": "U Penn", "15": "Tennessee State", "16": "Prairie View AM"}},
+    {name:"Mgoldy3",picks:{"1": "Arizona", "2": "Houston", "3": "Virginia", "4": "Kansas", "5": "Vanderbilt", "6": "BYU", "7": "UCLA", "8": "Ohio State", "9": "Iowa", "10": "Missouri", "11": "VCU", "12": "Akron", "13": "Troy", "14": "Kennesaw St", "15": "Queens", "16": "Prairie View AM"}},
+    {name:"Mgoldy4",picks:{"1": "Duke", "2": "Iowa State", "3": "Gonzaga", "4": "Arkansas", "5": "Texas Tech", "6": "Louisville", "7": "Saint Mary's", "8": "Clemson", "9": "Saint Louis", "10": "UCF", "11": "VCU", "12": "Northern Iowa", "13": "Troy", "14": "North Dakota State", "15": "Furman", "16": "Howard"}},
+    {name:"Mgoldy5",picks:{"1": "Arizona", "2": "UCONN", "3": "Illinois", "4": "Alabama", "5": "Wisconsin", "6": "North Carolina", "7": "Kentucky", "8": "Clemson", "9": "Saint Louis", "10": "UCF", "11": "Texas", "12": "McNeese", "13": "California Baptist", "14": "Kennesaw St", "15": "Idaho", "16": "Howard"}},
+    {name:"Old head",picks:{"1": "Duke", "2": "Iowa State", "3": "Illinois", "4": "Nebraska", "5": "Wisconsin", "6": "BYU", "7": "UCLA", "8": "Villanova", "9": "Iowa", "10": "Texas AM", "11": "SMU/Miami OH Winner", "12": "Northern Iowa", "13": "Hofstra", "14": "North Dakota State", "15": "Queens", "16": "LIU"}},
+    {name:"Old head 2",picks:{"1": "Arizona", "2": "Houston", "3": "Michigan St", "4": "Arkansas", "5": "Vanderbilt", "6": "BYU", "7": "UCLA", "8": "Ohio State", "9": "Iowa", "10": "Santa Clara", "11": "VCU", "12": "Northern Iowa", "13": "Hofstra", "14": "Wright State", "15": "Furman", "16": "Howard"}},
+    {name:"Old head 3",picks:{"1": "Michigan", "2": "Houston", "3": "Michigan St", "4": "Nebraska", "5": "St Johns", "6": "BYU", "7": "Saint Mary's", "8": "Ohio State", "9": "Saint Louis", "10": "Santa Clara", "11": "South Florida", "12": "High Point", "13": "Hofstra", "14": "U Penn", "15": "Queens", "16": "Siena"}},
+    {name:"Old head 4",picks:{"1": "Duke", "2": "Houston", "3": "Gonzaga", "4": "Alabama", "5": "Wisconsin", "6": "Tennessee", "7": "UCLA", "8": "Clemson", "9": "Iowa", "10": "Missouri", "11": "VCU", "12": "McNeese", "13": "Troy", "14": "U Penn", "15": "Tennessee State", "16": "LIU"}},
+    {name:"Old head 5",picks:{"1": "Duke", "2": "Houston", "3": "Illinois", "4": "Arkansas", "5": "Wisconsin", "6": "BYU", "7": "Kentucky", "8": "Villanova", "9": "TCU", "10": "Texas AM", "11": "Texas", "12": "McNeese", "13": "Troy", "14": "North Dakota State", "15": "Furman", "16": "Howard"}},
+    {name:"Oyster King",picks:{"1": "Duke", "2": "Houston", "3": "Gonzaga", "4": "Alabama", "5": "Wisconsin", "6": "BYU", "7": "UCLA", "8": "Villanova", "9": "Saint Louis", "10": "Texas AM", "11": "VCU", "12": "McNeese", "13": "Troy", "14": "North Dakota State", "15": "Furman", "16": "Howard"}},
+    {name:"Oyster King2",picks:{"1": "Michigan", "2": "UCONN", "3": "Virginia", "4": "Kansas", "5": "Texas Tech", "6": "North Carolina", "7": "Miami FL", "8": "Clemson", "9": "Saint Louis", "10": "Texas AM", "11": "South Florida", "12": "McNeese", "13": "Troy", "14": "North Dakota State", "15": "Furman", "16": "Howard"}},
+    {name:"Pags",picks:{"1": "Duke", "2": "Houston", "3": "Illinois", "4": "Nebraska", "5": "Wisconsin", "6": "Tennessee", "7": "Saint Mary's", "8": "Georgia", "9": "Utah State", "10": "Santa Clara", "11": "NC State/Texas Winner", "12": "Northern Iowa", "13": "Hawaii", "14": "Kennesaw St", "15": "Tennessee State", "16": "Prairie View AM"}},
+    {name:"Pdubs",picks:{"1": "Arizona", "2": "Iowa State", "3": "Michigan St", "4": "Arkansas", "5": "Wisconsin", "6": "BYU", "7": "UCLA", "8": "Ohio State", "9": "Iowa", "10": "Texas AM", "11": "VCU", "12": "Akron", "13": "Hofstra", "14": "Wright State", "15": "Furman", "16": "Siena"}},
+    {name:"Petrullo1",picks:{"1": "Duke", "2": "Houston", "3": "Gonzaga", "4": "Nebraska", "5": "Wisconsin", "6": "Tennessee", "7": "UCLA", "8": "Clemson", "9": "Utah State", "10": "Missouri", "11": "VCU", "12": "Akron", "13": "Hofstra", "14": "Wright State", "15": "Idaho", "16": "Howard"}},
+    {name:"Petrullo2",picks:{"1": "Arizona", "2": "Houston", "3": "Virginia", "4": "Kansas", "5": "Vanderbilt", "6": "BYU", "7": "UCLA", "8": "Clemson", "9": "TCU", "10": "Texas AM", "11": "South Florida", "12": "High Point", "13": "Hofstra", "14": "Kennesaw St", "15": "Furman", "16": "LIU"}},
+    {name:"Petrullo3",picks:{"1": "Michigan", "2": "Houston", "3": "Michigan St", "4": "Arkansas", "5": "Wisconsin", "6": "North Carolina", "7": "UCLA", "8": "Ohio State", "9": "Iowa", "10": "Missouri", "11": "Texas", "12": "Akron", "13": "Troy", "14": "U Penn", "15": "Queens", "16": "LIU"}},
+    {name:"Petrullo4",picks:{"1": "Arizona", "2": "Iowa State", "3": "Michigan St", "4": "Alabama", "5": "Wisconsin", "6": "BYU", "7": "UCLA", "8": "Georgia", "9": "Utah State", "10": "Missouri", "11": "SMU/Miami OH Winner", "12": "Akron", "13": "Troy", "14": "North Dakota State", "15": "Queens", "16": "Siena"}},
+    {name:"Petrullo5",picks:{"1": "Florida", "2": "Purdue", "3": "Illinois", "4": "Arkansas", "5": "St Johns", "6": "Tennessee", "7": "UCLA", "8": "Ohio State", "9": "Iowa", "10": "Santa Clara", "11": "Texas", "12": "McNeese", "13": "Troy", "14": "U Penn", "15": "Idaho", "16": "Howard"}},
+    {name:"R Lax",picks:{"1": "Duke", "2": "Iowa State", "3": "Michigan St", "4": "Arkansas", "5": "St Johns", "6": "BYU", "7": "Miami FL", "8": "Ohio State", "9": "Saint Louis", "10": "Santa Clara", "11": "SMU/Miami OH Winner", "12": "McNeese", "13": "Hofstra", "14": "Kennesaw St", "15": "Queens", "16": "Siena"}},
+    {name:"Raider Nation",picks:{"1": "Michigan", "2": "Houston", "3": "Michigan St", "4": "Kansas", "5": "Texas Tech", "6": "Tennessee", "7": "Saint Mary's", "8": "Villanova", "9": "Iowa", "10": "Missouri", "11": "VCU", "12": "Northern Iowa", "13": "Hofstra", "14": "U Penn", "15": "Tennessee State", "16": "Siena"}},
+    {name:"Rimkus",picks:{"1": "Arizona", "2": "Houston", "3": "Michigan St", "4": "Alabama", "5": "Vanderbilt", "6": "North Carolina", "7": "UCLA", "8": "Ohio State", "9": "Saint Louis", "10": "Santa Clara", "11": "NC State/Texas Winner", "12": "Akron", "13": "Troy", "14": "U Penn", "15": "Tennessee State", "16": "Howard"}},
+    {name:"Ruffini T",picks:{"1": "Arizona", "2": "Houston", "3": "Michigan St", "4": "Arkansas", "5": "St Johns", "6": "Tennessee", "7": "Miami FL", "8": "Ohio State", "9": "Iowa", "10": "Santa Clara", "11": "Texas", "12": "Akron", "13": "Hofstra", "14": "Wright State", "15": "Queens", "16": "Howard"}},
+    {name:"Ryan",picks:{"1": "Arizona", "2": "Iowa State", "3": "Gonzaga", "4": "Arkansas", "5": "St Johns", "6": "BYU", "7": "Saint Mary's", "8": "Villanova", "9": "TCU", "10": "UCF", "11": "SMU/Miami OH Winner", "12": "High Point", "13": "Hofstra", "14": "North Dakota State", "15": "Queens", "16": "Siena"}},
+    {name:"Ryan-alex",picks:{"1": "Arizona", "2": "UCONN", "3": "Michigan St", "4": "Nebraska", "5": "St Johns", "6": "BYU", "7": "UCLA", "8": "Clemson", "9": "Saint Louis", "10": "Texas AM", "11": "VCU", "12": "Akron", "13": "Hofstra", "14": "Kennesaw St", "15": "Queens", "16": "Siena"}},
+    {name:"SARDBEAR",picks:{"1": "Florida", "2": "Purdue", "3": "Michigan St", "4": "Kansas", "5": "Texas Tech", "6": "Tennessee", "7": "Saint Mary's", "8": "Georgia", "9": "Utah State", "10": "Santa Clara", "11": "South Florida", "12": "Akron", "13": "Hawaii", "14": "North Dakota State", "15": "Idaho", "16": "Howard"}},
+    {name:"SilkyJG",picks:{"1": "Arizona", "2": "UCONN", "3": "Gonzaga", "4": "Kansas", "5": "Wisconsin", "6": "Tennessee", "7": "UCLA", "8": "Clemson", "9": "Utah State", "10": "Missouri", "11": "South Florida", "12": "McNeese", "13": "California Baptist", "14": "North Dakota State", "15": "Idaho", "16": "Prairie View AM"}},
+    {name:"silkymike",picks:{"1": "Michigan", "2": "Purdue", "3": "Michigan St", "4": "Arkansas", "5": "St Johns", "6": "BYU", "7": "Saint Mary's", "8": "Ohio State", "9": "Utah State", "10": "Missouri", "11": "VCU", "12": "High Point", "13": "Hawaii", "14": "U Penn", "15": "Furman", "16": "Howard"}},
+    {name:"SMiller",picks:{"1": "Duke", "2": "Purdue", "3": "Michigan St", "4": "Arkansas", "5": "Vanderbilt", "6": "Tennessee", "7": "Kentucky", "8": "Clemson", "9": "TCU", "10": "UCF", "11": "VCU", "12": "High Point", "13": "Troy", "14": "U Penn", "15": "Tennessee State", "16": "LIU"}},
+    {name:"Stove Gods",picks:{"1": "Arizona", "2": "Houston", "3": "Michigan St", "4": "Nebraska", "5": "Texas Tech", "6": "BYU", "7": "UCLA", "8": "Ohio State", "9": "Utah State", "10": "Santa Clara", "11": "South Florida", "12": "Akron", "13": "Hofstra", "14": "Kennesaw St", "15": "Furman", "16": "Siena"}},
+    {name:"T.Whitehead",picks:{"1": "Duke", "2": "Houston", "3": "Michigan St", "4": "Arkansas", "5": "Vanderbilt", "6": "BYU", "7": "UCLA", "8": "Ohio State", "9": "Saint Louis", "10": "Missouri", "11": "SMU/Miami OH Winner", "12": "Akron", "13": "Hawaii", "14": "Wright State", "15": "Tennessee State", "16": "Prairie View AM"}},
+    {name:"TCrowley",picks:{"1": "Michigan", "2": "UCONN", "3": "Gonzaga", "4": "Nebraska", "5": "St Johns", "6": "North Carolina", "7": "Saint Mary's", "8": "Villanova", "9": "Saint Louis", "10": "UCF", "11": "VCU", "12": "Akron", "13": "Hofstra", "14": "U Penn", "15": "Queens", "16": "LIU"}},
+    {name:"thagler",picks:{"1": "Duke", "2": "Houston", "3": "Michigan St", "4": "Arkansas", "5": "St Johns", "6": "BYU", "7": "Saint Mary's", "8": "Villanova", "9": "TCU", "10": "UCF", "11": "VCU", "12": "McNeese", "13": "Troy", "14": "North Dakota State", "15": "Tennessee State", "16": "LIU"}},
+    {name:"Tim Trava",picks:{"1": "Arizona", "2": "Iowa State", "3": "Michigan St", "4": "Arkansas", "5": "St Johns", "6": "Tennessee", "7": "UCLA", "8": "Clemson", "9": "TCU", "10": "Missouri", "11": "Texas", "12": "Akron", "13": "Hofstra", "14": "North Dakota State", "15": "Queens", "16": "Siena"}},
+    {name:"Tony Fiorello",picks:{"1": "Florida", "2": "Iowa State", "3": "Michigan St", "4": "Arkansas", "5": "St Johns", "6": "BYU", "7": "Miami FL", "8": "Ohio State", "9": "Iowa", "10": "UCF", "11": "SMU/Miami OH Winner", "12": "Akron", "13": "Hofstra", "14": "Wright State", "15": "Furman", "16": "LIU"}},
+    {name:"troy’s boys",picks:{"1": "Arizona", "2": "Iowa State", "3": "Virginia", "4": "Arkansas", "5": "St Johns", "6": "BYU", "7": "Saint Mary's", "8": "Ohio State", "9": "Utah State", "10": "Santa Clara", "11": "South Florida", "12": "Akron", "13": "Troy", "14": "U Penn", "15": "Tennessee State", "16": "Siena"}},
+    {name:"UB4Life",picks:{"1": "Duke", "2": "Houston", "3": "Gonzaga", "4": "Nebraska", "5": "St Johns", "6": "North Carolina", "7": "Miami FL", "8": "Georgia", "9": "Utah State", "10": "Santa Clara", "11": "South Florida", "12": "McNeese", "13": "Hofstra", "14": "North Dakota State", "15": "Queens", "16": "LIU"}},
+    {name:"WalterClayton",picks:{"1": "Florida", "2": "Iowa State", "3": "Michigan St", "4": "Arkansas", "5": "St Johns", "6": "BYU", "7": "UCLA", "8": "Ohio State", "9": "TCU", "10": "Texas AM", "11": "VCU", "12": "Akron", "13": "Troy", "14": "Kennesaw St", "15": "Idaho", "16": "Howard"}},
+    {name:"Wineguy22",picks:{"1": "Arizona", "2": "Houston", "3": "Gonzaga", "4": "Arkansas", "5": "Vanderbilt", "6": "Tennessee", "7": "UCLA", "8": "Clemson", "9": "Saint Louis", "10": "Santa Clara", "11": "South Florida", "12": "Akron", "13": "California Baptist", "14": "Wright State", "15": "Queens", "16": "Prairie View AM"}},
+    {name:"Wisconsin Cheesehead",picks:{"1": "Michigan", "2": "Houston", "3": "Virginia", "4": "Kansas", "5": "Wisconsin", "6": "BYU", "7": "UCLA", "8": "Ohio State", "9": "Saint Louis", "10": "Missouri", "11": "South Florida", "12": "McNeese", "13": "Troy", "14": "Kennesaw St", "15": "Idaho", "16": "Prairie View AM"}},
+    {name:"Wisconsin Cheeseheads 2",picks:{"1": "Arizona", "2": "UCONN", "3": "Illinois", "4": "Alabama", "5": "Wisconsin", "6": "Tennessee", "7": "UCLA", "8": "Georgia", "9": "Iowa", "10": "Texas AM", "11": "VCU", "12": "Northern Iowa", "13": "Hofstra", "14": "North Dakota State", "15": "Queens", "16": "Siena"}},
+    {name:"Wrench to the Head",picks:{"1": "Arizona", "2": "Houston", "3": "Michigan St", "4": "Nebraska", "5": "Texas Tech", "6": "Tennessee", "7": "UCLA", "8": "Clemson", "9": "TCU", "10": "Texas AM", "11": "Texas", "12": "High Point", "13": "Hofstra", "14": "Wright State", "15": "Queens", "16": "LIU"}},
+    {name:"YNOT",picks:{"1": "Arizona", "2": "Houston", "3": "Michigan St", "4": "Arkansas", "5": "St Johns", "6": "Tennessee", "7": "UCLA", "8": "Clemson", "9": "TCU", "10": "Santa Clara", "11": "South Florida", "12": "Akron", "13": "Hofstra", "14": "Wright State", "15": "Furman", "16": "Prairie View AM"}},
+    {name:"YNOT2",picks:{"1": "Duke", "2": "Purdue", "3": "Virginia", "4": "Arkansas", "5": "Vanderbilt", "6": "BYU", "7": "Saint Mary's", "8": "Clemson", "9": "Saint Louis", "10": "Missouri", "11": "VCU", "12": "Akron", "13": "Troy", "14": "U Penn", "15": "Furman", "16": "Siena"}},
+    {name:"YNOT3",picks:{"1": "Arizona", "2": "Iowa State", "3": "Illinois", "4": "Kansas", "5": "Wisconsin", "6": "BYU", "7": "Miami FL", "8": "Clemson", "9": "TCU", "10": "UCF", "11": "South Florida", "12": "Akron", "13": "Hofstra", "14": "Wright State", "15": "Furman", "16": "Prairie View AM"}},
+    {name:"Zion Don Trumpenstein",picks:{"1": "Arizona", "2": "UCONN", "3": "Illinois", "4": "Alabama", "5": "Vanderbilt", "6": "Tennessee", "7": "Miami FL", "8": "Ohio State", "9": "Saint Louis", "10": "Santa Clara", "11": "South Florida", "12": "Northern Iowa", "13": "Troy", "14": "North Dakota State", "15": "Furman", "16": "Siena"}},
+  ],
+  "200": [
+    {name:"Bear Down Bay-Be!!!",picks:{"1": "Arizona", "2": "Houston", "3": "Virginia", "4": "Alabama", "5": "St Johns", "6": "North Carolina", "7": "Miami FL", "8": "Clemson", "9": "Saint Louis", "10": "UCF", "11": "Texas", "12": "High Point", "13": "Hofstra", "14": "Kennesaw St", "15": "Queens", "16": "Howard"}},
+    {name:"Bear Down Bay-Be!!! 2",picks:{"1": "Arizona", "2": "Iowa State", "3": "Michigan St", "4": "Kansas", "5": "Wisconsin", "6": "BYU", "7": "Saint Mary's", "8": "Ohio State", "9": "Utah State", "10": "Texas AM", "11": "VCU", "12": "McNeese", "13": "Hawaii", "14": "U Penn", "15": "Furman", "16": "Prairie View AM"}},
+    {name:"Big Al Tep",picks:{"1": "Arizona", "2": "Iowa State", "3": "Michigan St", "4": "Arkansas", "5": "St Johns", "6": "BYU", "7": "Saint Mary's", "8": "Ohio State", "9": "Utah State", "10": "Santa Clara", "11": "South Florida", "12": "Akron", "13": "Troy", "14": "Kennesaw St", "15": "Furman", "16": "Howard"}},
+    {name:"CAlba3",picks:{"1": "Michigan", "2": "Houston", "3": "Michigan St", "4": "Arkansas", "5": "St Johns", "6": "Tennessee", "7": "Miami FL", "8": "Ohio State", "9": "Iowa", "10": "Santa Clara", "11": "South Florida", "12": "High Point", "13": "Hofstra", "14": "Wright State", "15": "Queens", "16": "Siena"}},
+    {name:"Denz",picks:{"1": "Arizona", "2": "Iowa State", "3": "Michigan St", "4": "Arkansas", "5": "Vanderbilt", "6": "BYU", "7": "Saint Mary's", "8": "Ohio State", "9": "Saint Louis", "10": "Santa Clara", "11": "VCU", "12": "Akron", "13": "California Baptist", "14": "Wright State", "15": "Furman", "16": "Howard"}},
+    {name:"Dk",picks:{"1": "Duke", "2": "Houston", "3": "Virginia", "4": "Arkansas", "5": "Vanderbilt", "6": "Tennessee", "7": "UCLA", "8": "Clemson", "9": "Utah State", "10": "Missouri", "11": "VCU", "12": "High Point", "13": "Hawaii", "14": "Wright State", "15": "Furman", "16": "Siena"}},
+    {name:"Dr Ryder",picks:{"1": "Michigan", "2": "Houston", "3": "Michigan St", "4": "Arkansas", "5": "St Johns", "6": "BYU", "7": "Saint Mary's", "8": "Ohio State", "9": "Iowa", "10": "UCF", "11": "VCU", "12": "Akron", "13": "Hofstra", "14": "Kennesaw St", "15": "Queens", "16": "LIU"}},
+    {name:"Eli Hagler",picks:{"1": "Duke", "2": "Houston", "3": "Illinois", "4": "Kansas", "5": "Wisconsin", "6": "Tennessee", "7": "Kentucky", "8": "Georgia", "9": "TCU", "10": "Missouri", "11": "South Florida", "12": "Akron", "13": "Hawaii", "14": "Kennesaw St", "15": "Queens", "16": "LIU"}},
+    {name:"Gamblord1",picks:{"1": "Arizona", "2": "Iowa State", "3": "Illinois", "4": "Arkansas", "5": "St Johns", "6": "Tennessee", "7": "Kentucky", "8": "Ohio State", "9": "Iowa", "10": "Santa Clara", "11": "Texas", "12": "Northern Iowa", "13": "Hofstra", "14": "Kennesaw St", "15": "Idaho", "16": "Howard"}},
+    {name:"Gamblord2",picks:{"1": "Duke", "2": "Houston", "3": "Gonzaga", "4": "Arkansas", "5": "Vanderbilt", "6": "Tennessee", "7": "UCLA", "8": "Ohio State", "9": "Iowa", "10": "Missouri", "11": "Texas", "12": "Northern Iowa", "13": "Hofstra", "14": "Kennesaw St", "15": "Idaho", "16": "Howard"}},
+    {name:"Gamblord3",picks:{"1": "Michigan", "2": "Purdue", "3": "Illinois", "4": "Arkansas", "5": "St Johns", "6": "Louisville", "7": "UCLA", "8": "Ohio State", "9": "Iowa", "10": "Missouri", "11": "Texas", "12": "Northern Iowa", "13": "Hofstra", "14": "North Dakota State", "15": "Tennessee State", "16": "Howard"}},
+    {name:"Gamblord4",picks:{"1": "Michigan", "2": "Purdue", "3": "Michigan St", "4": "Arkansas", "5": "Vanderbilt", "6": "Louisville", "7": "UCLA", "8": "Ohio State", "9": "Iowa", "10": "Missouri", "11": "Texas", "12": "Northern Iowa", "13": "Hofstra", "14": "Kennesaw St", "15": "Idaho", "16": "Howard"}},
+    {name:"Gamblord5",picks:{"1": "Arizona", "2": "Houston", "3": "Illinois", "4": "Arkansas", "5": "Wisconsin", "6": "Tennessee", "7": "Kentucky", "8": "Ohio State", "9": "Iowa", "10": "Santa Clara", "11": "Texas", "12": "Northern Iowa", "13": "Hofstra", "14": "North Dakota State", "15": "Tennessee State", "16": "Howard"}},
+    {name:"JackTheRipper",picks:{"1": "Arizona", "2": "Houston", "3": "Illinois", "4": "Arkansas", "5": "Vanderbilt", "6": "BYU", "7": "UCLA", "8": "Ohio State", "9": "Utah State", "10": "Santa Clara", "11": "South Florida", "12": "High Point", "13": "Hawaii", "14": "U Penn", "15": "Tennessee State", "16": "Siena"}},
+    {name:"JDP24",picks:{"1": "Duke", "2": "Iowa State", "3": "Illinois", "4": "Arkansas", "5": "St Johns", "6": "BYU", "7": "Saint Mary's", "8": "Georgia", "9": "TCU", "10": "Texas AM", "11": "South Florida", "12": "Akron", "13": "Troy", "14": "Kennesaw St", "15": "Tennessee State", "16": "Siena"}},
+    {name:"Jimmy Chun",picks:{"1": "Arizona", "2": "Houston", "3": "Michigan St", "4": "Arkansas", "5": "St Johns", "6": "Tennessee", "7": "UCLA", "8": "Ohio State", "9": "Saint Louis", "10": "Santa Clara", "11": "VCU", "12": "Akron", "13": "Troy", "14": "Kennesaw St", "15": "Queens", "16": "Prairie View AM"}},
+    {name:"JLOU",picks:{"1": "Arizona", "2": "Houston", "3": "Michigan St", "4": "Kansas", "5": "Vanderbilt", "6": "BYU", "7": "UCLA", "8": "Ohio State", "9": "Iowa", "10": "Santa Clara", "11": "South Florida", "12": "Akron", "13": "Troy", "14": "U Penn", "15": "Furman", "16": "Howard"}},
+    {name:"JMO",picks:{"1": "Arizona", "2": "Houston", "3": "Gonzaga", "4": "Arkansas", "5": "St Johns", "6": "Tennessee", "7": "UCLA", "8": "Georgia", "9": "Iowa", "10": "Missouri", "11": "South Florida", "12": "Northern Iowa", "13": "Hofstra", "14": "Wright State", "15": "Furman", "16": "Siena"}},
+    {name:"JordanKatz1",picks:{"1": "Arizona", "2": "Iowa State", "3": "Michigan St", "4": "Arkansas", "5": "Vanderbilt", "6": "Tennessee", "7": "UCLA", "8": "Ohio State", "9": "Iowa", "10": "Santa Clara", "11": "Texas", "12": "High Point", "13": "Troy", "14": "U Penn", "15": "Furman", "16": "Howard"}},
+    {name:"Jozstradamus",picks:{"1": "Arizona", "2": "Houston", "3": "Virginia", "4": "Arkansas", "5": "St Johns", "6": "Tennessee", "7": "UCLA", "8": "Ohio State", "9": "Saint Louis", "10": "Santa Clara", "11": "South Florida", "12": "Akron", "13": "Hofstra", "14": "Kennesaw St", "15": "Furman", "16": "Howard"}},
+    {name:"Jrey",picks:{"1": "Michigan", "2": "Purdue", "3": "Michigan St", "4": "Nebraska", "5": "St Johns", "6": "BYU", "7": "Kentucky", "8": "Ohio State", "9": "Iowa", "10": "Texas AM", "11": "Miami OH", "12": "Akron", "13": "California Baptist", "14": "U Penn", "15": "Idaho", "16": "LIU"}},
+    {name:"Jrey #2",picks:{"1": "Michigan", "2": "Purdue", "3": "Illinois", "4": "Alabama", "5": "St Johns", "6": "BYU", "7": "UCLA", "8": "Clemson", "9": "Utah State", "10": "Texas AM", "11": "Miami OH", "12": "High Point", "13": "Troy", "14": "Kennesaw St", "15": "Furman", "16": "LIU"}},
+    {name:"Juker",picks:{"1": "Arizona", "2": "Houston", "3": "Michigan St", "4": "Alabama", "5": "Vanderbilt", "6": "Tennessee", "7": "UCLA", "8": "Ohio State", "9": "Iowa", "10": "Missouri", "11": "Texas", "12": "Akron", "13": "Troy", "14": "Kennesaw St", "15": "Furman", "16": "Prairie View AM"}},
+    {name:"Kegs",picks:{"1": "Florida", "2": "Purdue", "3": "Illinois", "4": "Kansas", "5": "Wisconsin", "6": "North Carolina", "7": "UCLA", "8": "Villanova", "9": "TCU", "10": "Texas AM", "11": "VCU", "12": "High Point", "13": "Hawaii", "14": "North Dakota State", "15": "Idaho", "16": "Siena"}},
+    {name:"LentzLox",picks:{"1": "Duke", "2": "Houston", "3": "Gonzaga", "4": "Kansas", "5": "St Johns", "6": "Tennessee", "7": "Kentucky", "8": "Villanova", "9": "Utah State", "10": "Missouri", "11": "Miami OH", "12": "McNeese", "13": "Hawaii", "14": "U Penn", "15": "Furman", "16": "Prairie View AM"}},
+    {name:"Luckman",picks:{"1": "Arizona", "2": "Iowa State", "3": "Michigan St", "4": "Kansas", "5": "Vanderbilt", "6": "BYU", "7": "UCLA", "8": "Ohio State", "9": "Iowa", "10": "Santa Clara", "11": "VCU", "12": "McNeese", "13": "Hofstra", "14": "Wright State", "15": "Furman", "16": "Prairie View AM"}},
+    {name:"Luckman2",picks:{"1": "Duke", "2": "Purdue", "3": "Illinois", "4": "Nebraska", "5": "Wisconsin", "6": "Tennessee", "7": "Saint Mary's", "8": "Georgia", "9": "Utah State", "10": "Santa Clara", "11": "Miami OH", "12": "Akron", "13": "Hofstra", "14": "Wright State", "15": "Furman", "16": "Howard"}},
+    {name:"Luckman3",picks:{"1": "Michigan", "2": "Houston", "3": "Gonzaga", "4": "Arkansas", "5": "St Johns", "6": "Tennessee", "7": "UCLA", "8": "Ohio State", "9": "Utah State", "10": "Santa Clara", "11": "South Florida", "12": "McNeese", "13": "Hofstra", "14": "Wright State", "15": "Furman", "16": "Siena"}},
+    {name:"Mitch",picks:{"1": "Florida", "2": "Iowa State", "3": "Virginia", "4": "Arkansas", "5": "Wisconsin", "6": "Tennessee", "7": "Miami FL", "8": "Ohio State", "9": "Iowa", "10": "UCF", "11": "VCU", "12": "McNeese", "13": "Hawaii", "14": "Kennesaw St", "15": "Furman", "16": "Prairie View AM"}},
+    {name:"Oyster King",picks:{"1": "Duke", "2": "Houston", "3": "Gonzaga", "4": "Alabama", "5": "Wisconsin", "6": "BYU", "7": "UCLA", "8": "Villanova", "9": "Saint Louis", "10": "Texas AM", "11": "VCU", "12": "McNeese", "13": "Troy", "14": "North Dakota State", "15": "Furman", "16": "Howard"}},
+    {name:"Pete Lamba",picks:{"1": "Michigan", "2": "Houston", "3": "Michigan St", "4": "Arkansas", "5": "Vanderbilt", "6": "Louisville", "7": "UCLA", "8": "Georgia", "9": "TCU", "10": "Texas AM", "11": "Texas", "12": "High Point", "13": "Hofstra", "14": "Wright State", "15": "Tennessee State", "16": "LIU"}},
+    {name:"Rimkus",picks:{"1": "Arizona", "2": "Houston", "3": "Michigan St", "4": "Alabama", "5": "Vanderbilt", "6": "North Carolina", "7": "UCLA", "8": "Ohio State", "9": "Saint Louis", "10": "Santa Clara", "11": "Texas", "12": "Akron", "13": "Troy", "14": "U Penn", "15": "Tennessee State", "16": "Howard"}},
+    {name:"SARDBEAR",picks:{"1": "Florida", "2": "Purdue", "3": "Michigan St", "4": "Kansas", "5": "Texas Tech", "6": "Tennessee", "7": "Saint Mary's", "8": "Georgia", "9": "Utah State", "10": "Santa Clara", "11": "South Florida", "12": "Akron", "13": "Hawaii", "14": "North Dakota State", "15": "Idaho", "16": "Howard"}},
+    {name:"troy’s boys",picks:{"1": "Arizona", "2": "Iowa State", "3": "Virginia", "4": "Arkansas", "5": "St Johns", "6": "BYU", "7": "Saint Mary's", "8": "Ohio State", "9": "Utah State", "10": "Santa Clara", "11": "South Florida", "12": "Akron", "13": "Troy", "14": "U Penn", "15": "Tennessee State", "16": "Siena"}},
+    {name:"Vukota",picks:{"1": "Florida", "2": "Iowa State", "3": "Michigan St", "4": "Arkansas", "5": "St Johns", "6": "North Carolina", "7": "Miami FL", "8": "Georgia", "9": "TCU", "10": "Santa Clara", "11": "South Florida", "12": "Akron", "13": "Hofstra", "14": "U Penn", "15": "Furman", "16": "Siena"}},
+    {name:"Wineguy22",picks:{"1": "Arizona", "2": "Houston", "3": "Gonzaga", "4": "Arkansas", "5": "Vanderbilt", "6": "Tennessee", "7": "UCLA", "8": "Clemson", "9": "Saint Louis", "10": "Santa Clara", "11": "South Florida", "12": "Akron", "13": "California Baptist", "14": "Wright State", "15": "Queens", "16": "Prairie View AM"}},
+    {name:"Wisconsin Cheesehead",picks:{"1": "Michigan", "2": "Houston", "3": "Virginia", "4": "Kansas", "5": "Wisconsin", "6": "BYU", "7": "UCLA", "8": "Ohio State", "9": "Saint Louis", "10": "Missouri", "11": "South Florida", "12": "McNeese", "13": "Troy", "14": "Kennesaw St", "15": "Idaho", "16": "Prairie View AM"}},
+    {name:"Wisconsin Cheeseheads 2",picks:{"1": "Arizona", "2": "UCONN", "3": "Illinois", "4": "Alabama", "5": "Wisconsin", "6": "Tennessee", "7": "UCLA", "8": "Georgia", "9": "Iowa", "10": "Texas AM", "11": "VCU", "12": "Northern Iowa", "13": "Hofstra", "14": "North Dakota State", "15": "Queens", "16": "Siena"}},
+    {name:"Wrench to the Head",picks:{"1": "Arizona", "2": "Houston", "3": "Michigan St", "4": "Nebraska", "5": "Texas Tech", "6": "Louisville", "7": "Miami FL", "8": "Clemson", "9": "TCU", "10": "Texas AM", "11": "Texas", "12": "High Point", "13": "Hofstra", "14": "Wright State", "15": "Queens", "16": "LIU"}},
+    {name:"YNOT",picks:{"1": "Arizona", "2": "Houston", "3": "Michigan St", "4": "Arkansas", "5": "St Johns", "6": "Tennessee", "7": "UCLA", "8": "Clemson", "9": "TCU", "10": "Santa Clara", "11": "South Florida", "12": "Akron", "13": "Hofstra", "14": "Wright State", "15": "Furman", "16": "Prairie View AM"}},
+    {name:"YNOT2",picks:{"1": "Duke", "2": "Purdue", "3": "Virginia", "4": "Arkansas", "5": "Vanderbilt", "6": "BYU", "7": "Saint Mary's", "8": "Clemson", "9": "Saint Louis", "10": "Missouri", "11": "VCU", "12": "Akron", "13": "Troy", "14": "U Penn", "15": "Furman", "16": "Siena"}},
+    {name:"YNOT3",picks:{"1": "Arizona", "2": "Iowa State", "3": "Illinois", "4": "Kansas", "5": "Wisconsin", "6": "BYU", "7": "Miami FL", "8": "Clemson", "9": "TCU", "10": "UCF", "11": "South Florida", "12": "Akron", "13": "Hofstra", "14": "Wright State", "15": "Furman", "16": "Prairie View AM"}},
+  ],
+};
+
+// ============ PAYOUT STRUCTURES ============
+const PAYOUTS = {
+  "50": {
+    pot: 11600, entries: 286, paid: 232,
+    round: [
+      { name:"After Round 1", prizes:[["Leader","$600"],["2nd Place","$300"]] },
+      { name:"After Round 2", prizes:[["Leader","$600"],["2nd Place","$300"]] },
+      { name:"After Sweet 16", prizes:[["Leader","$300"]] },
+      { name:"After Elite 8", prizes:[["Leader","$300"]] },
+    ],
+    overall: [
+      ["1st","$3,000"],["2nd","$1,500"],["3rd","$1,000"],["4th","$800"],
+      ["5th","$700"],["6th","$600"],["7th","$500"],["8th","$400"],
+      ["9th","$300"],["10th","$200"]
+    ]
+  },
+  "100": {
+    pot: 12900, entries: 154, paid: 129,
+    round: [
+      { name:"After Round 1", prizes:[["Leader","$600"],["2nd Place","$200"]] },
+      { name:"After Round 2", prizes:[["Leader","$600"],["2nd Place","$200"]] },
+      { name:"After Sweet 16", prizes:[["Leader","$400"]] },
+      { name:"After Elite 8", prizes:[["Leader","$400"]] },
+    ],
+    overall: [
+      ["1st","$4,000"],["2nd","$2,000"],["3rd","$1,500"],["4th","$1,000"],
+      ["5th","$800"],["6th","$600"],["7th","$500"],["8th","$200"]
+    ]
+  },
+  "200": {
+    pot: 7600, entries: 42, paid: 38,
+    round: [
+      { name:"After Round 1", prizes:[["Leader","$600"],["2nd Place","$200"]] },
+      { name:"After Round 2", prizes:[["Leader","$600"],["2nd Place","$200"]] },
+      { name:"After Sweet 16", prizes:[["Leader","$400"]] },
+      { name:"After Elite 8", prizes:[["Leader","$400"]] },
+    ],
+    overall: [
+      ["1st","$3,000"],["2nd","$1,400"],["3rd","$800"]
+    ]
+  }
+};
+
+// ============ TOURNAMENT RESULTS ============
+const RESULTS = {
+  // === Elite 8 WINNERS (in Final Four) ===
+  "Illinois":    {status:"won", round:4},
+  "Arizona":     {status:"won", round:4},
+  // === Elite 8 — games not yet played (March 29) ===
+  "Duke":        {status:"won", round:3},
+  "Michigan":    {status:"won", round:3},
+  "UCONN":       {status:"won", round:3},
+  "Tennessee":   {status:"won", round:3},
+  // === Elite 8 LOSERS ===
+  "Purdue":      {status:"lost", round:4},
+  "Iowa":        {status:"lost", round:4},
+  // === Sweet 16 LOSERS (lost in S16, not E8) ===
+  "St Johns":    {status:"lost", round:3},
+  "Alabama":     {status:"lost", round:3},
+  "Michigan St": {status:"lost", round:3},
+  "Iowa State":  {status:"lost", round:3},
+  // === Sweet 16 LOSERS ===
+  "Houston":     {status:"lost", round:3},
+  "Texas":       {status:"lost", round:3},
+  "Nebraska":    {status:"lost", round:3},
+  "Arkansas":    {status:"lost", round:3},
+  // === Saturday R2 LOSERS ===
+  "Saint Louis": {status:"lost", round:2},
+  "TCU":         {status:"lost", round:2},
+  "Texas AM":    {status:"lost", round:2},
+  "Louisville":  {status:"lost", round:2},
+  "Gonzaga":     {status:"lost", round:2},
+  "Vanderbilt":  {status:"lost", round:2},
+  "High Point":  {status:"lost", round:2},
+  // === Sunday R2 LOSERS ===
+  "VCU":         {status:"lost", round:2},
+  // === Sunday R2 LOSERS ===
+  "Florida":     {status:"lost", round:2},
+  "Virginia":    {status:"lost", round:2},
+  "Kansas":      {status:"lost", round:2},
+  "Texas Tech":  {status:"lost", round:2},
+  "UCLA":        {status:"lost", round:2},
+  "Kentucky":    {status:"lost", round:2},
+  "Miami FL":    {status:"lost", round:2},
+  "Utah State":  {status:"lost", round:2},
+  // === R1 losers ===
+  "Wisconsin":   {status:"lost", round:1},
+  "North Carolina":{status:"lost", round:1},
+  "BYU":         {status:"lost", round:1},
+  "Saint Mary's":{status:"lost", round:1},
+  "Georgia":     {status:"lost", round:1},
+  "Ohio State":  {status:"lost", round:1},
+  "Clemson":     {status:"lost", round:1},
+  "Villanova":   {status:"lost", round:1},
+  "South Florida":{status:"lost", round:1},
+  "McNeese":     {status:"lost", round:1},
+  "Hawaii":      {status:"lost", round:1},
+  "Troy":        {status:"lost", round:1},
+  "U Penn":      {status:"lost", round:1},
+  "North Dakota State":{status:"lost", round:1},
+  "Kennesaw St": {status:"lost", round:1},
+  "Idaho":       {status:"lost", round:1},
+  "Howard":      {status:"lost", round:1},
+  "Siena":       {status:"lost", round:1},
+  "Miami OH":    {status:"lost", round:1},
+  "Northern Iowa":{status:"lost", round:1},
+  "Akron":       {status:"lost", round:1},
+  "Hofstra":     {status:"lost", round:1},
+  "California Baptist":{status:"lost", round:1},
+  "Wright State":{status:"lost", round:1},
+  "Furman":      {status:"lost", round:1},
+  "Tennessee State":{status:"lost", round:1},
+  "Queens":      {status:"lost", round:1},
+  "Prairie View AM":{status:"lost", round:1},
+  "LIU":         {status:"lost", round:1},
+  // === Play-in / not in tournament ===
+  "Missouri":    {status:"lost", round:1},
+  "UCF":         {status:"lost", round:1},
+  "Santa Clara": {status:"lost", round:1},
+  "Lui":         {status:"lost", round:1},
+};
+
+function normalizeTeam(t) {
+  const map = {"Liu":"LIU","NC State/Texas Winner":"Texas","SMU/Miami OH Winner":"Miami OH"};
+  return map[t] || t;
+}
+
+// ============ SCORING ============
+const ROUND_BONUS = {1:0, 2:2, 3:4, 4:6, 5:8, 6:10};
+const MAX_ROUNDS = 6;
+
+function getTeamStatus(team) {
+  return RESULTS[normalizeTeam(team)] || {status:"pending"};
+}
+
+// FIXED: Teams keep points even when eliminated
+// "lost" at round N means they lost IN round N, so they won rounds 1 through N-1
+// "won" at round N means they've won through round N
+function calcPoints(picks) {
+  let total = 0;
+  for (const [seedStr, team] of Object.entries(picks)) {
+    const seed = parseInt(seedStr);
+    const info = getTeamStatus(team);
+    let roundsWon = 0;
+    if (info.status === "won") roundsWon = info.round || 1;
+    else if (info.status === "lost") roundsWon = (info.round || 1) - 1;
+    for (let r = 1; r <= roundsWon; r++) {
+      total += seed + ROUND_BONUS[r];
+    }
+  }
+  return total;
+}
+
+// Points breakdown by round — cumulative through each round
+function calcRoundPoints(picks) {
+  const rp = {1:0,2:0,3:0,4:0,5:0,6:0};
+  for (const [seedStr, team] of Object.entries(picks)) {
+    const seed = parseInt(seedStr);
+    const info = getTeamStatus(team);
+    let roundsWon = 0;
+    if (info.status === "won") roundsWon = info.round || 1;
+    else if (info.status === "lost") roundsWon = (info.round || 1) - 1;
+    for (let r = 1; r <= roundsWon; r++) {
+      rp[r] += seed + ROUND_BONUS[r];
+    }
+  }
+  // Make cumulative: R2 = R1+R2, S16 = R1+R2+S16, etc.
+  for (let r = 2; r <= 6; r++) rp[r] += rp[r-1];
+  return rp;
+}
+
+// Determine the latest round that has any results
+function getMaxActiveRound() {
+  let maxRd = 0;
+  for (const t of Object.values(RESULTS)) {
+    if (t.round && t.round > maxRd) maxRd = t.round;
+  }
+  return maxRd || 1;
+}
+
+function calcAlive(picks) {
+  let alive = 0, eliminated = 0;
+  for (const [, team] of Object.entries(picks)) {
+    const s = getTeamStatus(team).status;
+    if (s === "lost") eliminated++; else alive++;
+  }
+  return { alive, eliminated };
+}
+
+function calcMaxPotential(picks) {
+  let total = calcPoints(picks);
+  for (const [seedStr, team] of Object.entries(picks)) {
+    const seed = parseInt(seedStr);
+    const info = getTeamStatus(team);
+    if (info.status === "lost") continue;
+    const currentRound = info.status === "won" ? (info.round || 1) : 0;
+    for (let r = currentRound + 1; r <= MAX_ROUNDS; r++) {
+      total += seed + ROUND_BONUS[r];
+    }
+  }
+  return total;
+}
+
+function buildTooltip(name, picks) {
+  const RDL = {1:"R1",2:"R2",3:"S16",4:"E8",5:"F4",6:"Ch"};
+  let rows = [];
+  let grandTotal = 0;
+  for (let s = 1; s <= 16; s++) {
+    const team = picks[String(s)];
+    if (!team) continue;
+    const info = getTeamStatus(team);
+    let pts = 0, detail = [];
+    let roundsWon = 0;
+    if (info.status === "won") roundsWon = info.round || 1;
+    else if (info.status === "lost") roundsWon = (info.round || 1) - 1;
+    for (let r = 1; r <= roundsWon; r++) {
+      const rp = s + ROUND_BONUS[r];
+      pts += rp;
+      detail.push(RDL[r] + ":" + rp);
+    }
+    grandTotal += pts;
+    const cls = info.status === "won" ? "tt-won" : info.status === "lost" ? "tt-lost" : "tt-pend";
+    const status = info.status === "won" ? "✅" : info.status === "lost" ? "❌" : "⏳";
+    rows.push(`<div class="tt-row ${cls}"><span class="tt-seed">${s}</span><span class="tt-team">${status} ${team}</span><span class="tt-val">${pts > 0 ? "+" + pts : "—"}</span></div>`);
+    if (detail.length) rows.push(`<div class="tt-row" style="padding-left:24px;opacity:.55;font-size:10px"><span class="tt-team">${detail.join(" + ")}</span><span class="tt-val"></span></div>`);
+  }
+  return `<div class="tt"><div class="tt-title">${name} — Point Breakdown</div>${rows.join("")}<div class="tt-total"><span>TOTAL</span><span>${grandTotal}</span></div></div>`;
+}
+
+// ============ ODDS (Power Rating) ============
+const SEED_EXP_WINS = {1:3.5,2:2.8,3:2.2,4:1.8,5:1.3,6:1.2,7:1.1,8:0.9,9:0.9,10:0.7,11:0.6,12:0.5,13:0.25,14:0.15,15:0.07,16:0.02};
+let cachedOdds = {}, oddsNeedRecalc = true, _seedMap = null;
+
+function getSeedForTeam(team) {
+  if (!_seedMap) {
+    _seedMap = {};
+    for (const tier of Object.values(POOL_DATA))
+      for (const e of tier)
+        for (const [s, t] of Object.entries(e.picks))
+          _seedMap[normalizeTeam(t)] = parseInt(s);
+  }
+  return _seedMap[team] || _seedMap[normalizeTeam(team)] || null;
+}
+
+function calcExpectedScore(picks) {
+  let total = calcPoints(picks);
+  for (const [seedStr, team] of Object.entries(picks)) {
+    const seed = parseInt(seedStr);
+    const info = getTeamStatus(team);
+    if (info.status === "lost") continue;
+    const cur = info.status === "won" ? (info.round || 1) : 0;
+    const ew = SEED_EXP_WINS[seed] || 0.5;
+    const rem = MAX_ROUNDS - cur;
+    const fw = Math.min(ew, rem);
+    for (let w = 0; w < fw; w++) {
+      const fr = cur + 1 + w;
+      if (fr > MAX_ROUNDS) break;
+      const rp = Math.pow(ew / (rem||1), w * 0.3);
+      total += (seed + ROUND_BONUS[fr]) * rp;
+    }
+  }
+  return total;
+}
+
+function calcWinOdds(tierKey) {
+  const entries = POOL_DATA[tierKey];
+  const es = entries.map(e => calcExpectedScore(e.picks));
+  const mx = Math.max(...es), rng = mx - Math.min(...es) || 1;
+  const temp = rng * 0.12;
+  const exps = es.map(s => Math.exp((s - mx) / (temp || 1)));
+  const sm = exps.reduce((a, b) => a + b, 0);
+  const odds = {};
+  for (let i = 0; i < entries.length; i++) odds[entries[i].name] = (exps[i] / sm) * 100;
+  return odds;
+}
+
+function getOdds(tierKey) {
+  if (!cachedOdds[tierKey] || oddsNeedRecalc) cachedOdds[tierKey] = calcWinOdds(tierKey);
+  return cachedOdds[tierKey];
+}
+
+function toAmericanOdds(pct) {
+  const prob = pct / 100;
+  if (prob <= 0.001) return { str:"+99999", cls:"odds-dead" };
+  if (prob >= 0.5) return { str: Math.round(-(prob / (1 - prob)) * 100).toLocaleString(), cls:"odds-fav" };
+  let am = Math.round(((1 - prob) / prob) * 100);
+  if (am > 99999) am = 99999;
+  return { str: "+" + am.toLocaleString(), cls: am > 10000 ? "odds-dead" : "odds-long" };
+}
+
+// ============ STATE ============
+let currentTier = "50", currentView = "board";
+
+// ============ RENDER ============
+function renderTabs() {
+  const el = document.getElementById("tierBar");
+  el.innerHTML = "";
+  for (const t of ["50","100","200"]) {
+    const b = document.createElement("button");
+    b.className = "tier-btn" + (t === currentTier ? " active" : "");
+    b.innerHTML = `$${t}<span class="sub">${POOL_DATA[t].length} entries</span>`;
+    b.onclick = () => { currentTier = t; oddsNeedRecalc = true; render(); oddsNeedRecalc = false; };
+    el.appendChild(b);
+  }
+}
+
+function renderStats() {
+  const entries = POOL_DATA[currentTier];
+  const payout = PAYOUTS[currentTier];
+  const scores = entries.map(e => ({name:e.name, pts:calcPoints(e.picks)})).sort((a,b) => b.pts - a.pts);
+  const leader = scores[0];
+  const avg = (scores.reduce((s,e) => s+e.pts, 0) / scores.length).toFixed(1);
+  const decided = Object.values(RESULTS).filter(r => r.status !== "pending").length;
+
+  document.getElementById("stats").innerHTML = `
+    <div class="stat prize"><div class="lbl">Prize Pool</div><div class="val">$${payout.pot.toLocaleString()}</div></div>
+    <div class="stat leader"><div class="lbl">Current Leader</div><div class="val">${leader.name}</div><div class="sub" style="color:var(--green)">${leader.pts} pts</div></div>
+    <div class="stat avg"><div class="lbl">Avg Score</div><div class="val" style="color:var(--accent2)">${avg}</div></div>
+    <div class="stat games"><div class="lbl">Games Decided</div><div class="val" style="color:#a855f7">${decided}</div></div>
+    <div class="stat"><div class="lbl">Entries</div><div class="val" style="color:var(--text)">${payout.entries}</div><div style="font-size:11px;color:var(--muted)">${payout.paid} paid</div></div>
+  `;
+}
+
+function renderPayouts() {
+  const p = PAYOUTS[currentTier];
+  let html = '<div class="payout-grid"><div class="payout-section"><h4>💸 Round Bonuses</h4>';
+  for (const r of p.round) {
+    html += `<div style="margin-bottom:8px"><div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:2px">${r.name}</div>`;
+    for (const [place, amt] of r.prizes)
+      html += `<div class="payout-row"><span class="place">${place}</span><span class="amount">${amt}</span></div>`;
+    html += '</div>';
+  }
+  html += '</div><div class="payout-section"><h4>🏆 Overall Standings</h4>';
+  for (const [place, amt] of p.overall)
+    html += `<div class="payout-row"><span class="place">${place}</span><span class="amount">${amt}</span></div>`;
+  html += '</div></div>';
+  document.getElementById("payoutsPanel").innerHTML = html;
+}
+
+function togglePayouts() {
+  const p = document.getElementById("payoutsPanel");
+  p.classList.toggle("show");
+  document.getElementById("payoutsToggle").textContent = p.classList.contains("show") ? "💰 Payout Structure ▴" : "💰 View Payout Structure ▾";
+}
+
+function renderTable() {
+  const entries = POOL_DATA[currentTier];
+  const odds = getOdds(currentTier);
+  const q = document.getElementById("search").value.toLowerCase();
+  let rows = entries.map(e => {
+    const { alive, eliminated } = calcAlive(e.picks);
+    const rp = calcRoundPoints(e.picks);
+    return { ...e, pts:calcPoints(e.picks), alive, eliminated, max:calcMaxPotential(e.picks), odds:odds[e.name]||0, rp };
+  });
+  rows.sort((a,b) => b.pts - a.pts || b.max - a.max);
+  // Ranks
+  for (let i = 0; i < rows.length; i++)
+    rows[i].rank = (i > 0 && rows[i].pts === rows[i-1].pts) ? rows[i-1].rank : i + 1;
+  if (q) rows = rows.filter(e => e.name.toLowerCase().includes(q));
+
+  const tbl = document.getElementById("tbl");
+  if (currentView === "board") {
+    const mx = Math.max(...rows.map(e => e.odds), 0.01);
+    const RD_LABELS = {1:"R1",2:"R2",3:"S16",4:"E8",5:"F4",6:"Champ"};
+    let h = `<thead><tr><th class="col-rank">Rank</th><th>Entry</th><th style="text-align:right">Pts</th><th style="text-align:right">Odds</th>`;
+    for (let r = 1; r <= 6; r++) h += `<th style="text-align:right;font-size:10px">${RD_LABELS[r]}</th>`;
+    h += `<th style="text-align:center">Alive</th><th style="text-align:center">Elim</th><th style="text-align:right">Max</th></tr></thead><tbody>`;
+    for (const e of rows) {
+      const rc = e.rank <= 3 ? ` r${e.rank}` : "";
+      const medal = e.rank === 1 ? "🥇" : e.rank === 2 ? "🥈" : e.rank === 3 ? "🥉" : "";
+      const o = toAmericanOdds(e.odds);
+      h += `<tr>
+        <td class="col-rank${rc}">${medal || e.rank}</td>
+        <td class="col-name">${e.name}${buildTooltip(e.name, e.picks)}</td>
+        <td class="col-pts">${e.pts}</td>
+        <td class="col-odds"><span class="${o.cls}">${o.str}</span></td>`;
+      const maxRd = getMaxActiveRound();
+      for (let r = 1; r <= 6; r++) h += `<td class="col-rd">${r <= maxRd ? (e.rp[r] || 0) : "—"}</td>`;
+      h += `<td class="col-alive">${e.alive}</td>
+        <td class="col-elim">${e.eliminated}</td>
+        <td class="col-max">${e.max}</td>
+      </tr>`;
+    }
+    h += `</tbody><tfoot><tr><td colspan="13" class="tbl-foot">Odds based on power ratings • Round columns show cumulative points through that round</td></tr></tfoot>`;
+    tbl.innerHTML = h;
+  } else {
+    let h = `<thead><tr><th class="col-rank">#</th><th>Entry</th><th style="text-align:right;width:45px">Pts</th>`;
+    for (let s = 1; s <= 16; s++) h += `<th class="pick" style="font-size:10px">${s}</th>`;
+    h += "</tr></thead><tbody>";
+    for (const e of rows) {
+      h += `<tr><td class="col-rank">${e.rank}</td><td class="col-name">${e.name}${buildTooltip(e.name, e.picks)}</td><td class="col-pts">${e.pts}</td>`;
+      for (let s = 1; s <= 16; s++) {
+        const team = e.picks[String(s)];
+        const info = getTeamStatus(team);
+        const cls = info.status === "won" ? "w" : info.status === "lost" ? "l" : "p";
+        const short = team.length > 11 ? team.substring(0,10) + "…" : team;
+        h += `<td class="pick ${cls}" title="${team}">${short}</td>`;
+      }
+      h += "</tr>";
+    }
+    h += "</tbody>";
+    tbl.innerHTML = h;
+  }
+}
+
+function setView(v, btn) {
+  currentView = v;
+  document.querySelectorAll(".view-btns button").forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+  const tblWrap = document.querySelector(".tbl-wrap");
+  const brkWrap = document.getElementById("bracketWrap");
+  if (v === "bracket") {
+    tblWrap.style.display = "none";
+    brkWrap.classList.add("show");
+    renderBracket();
+  } else {
+    tblWrap.style.display = "";
+    brkWrap.classList.remove("show");
+    renderTable();
+  }
+}
+
+// ============ BRACKET DATA ============
+const BRACKET = {
+  "East": {
+    r1: [
+      [[1,"Duke"],[16,"Siena"]],
+      [[8,"Ohio State"],[9,"TCU"]],
+      [[5,"St Johns"],[12,"Northern Iowa"]],
+      [[4,"Kansas"],[13,"California Baptist"]],
+      [[6,"Louisville"],[11,"South Florida"]],
+      [[3,"Michigan St"],[14,"North Dakota State"]],
+      [[7,"UCLA"],[10,"UCF"]],
+      [[2,"UCONN"],[15,"Furman"]]
+    ]
+  },
+  "South": {
+    r1: [
+      [[1,"Florida"],[16,"Prairie View AM"]],
+      [[8,"Clemson"],[9,"Iowa"]],
+      [[5,"Vanderbilt"],[12,"McNeese"]],
+      [[4,"Nebraska"],[13,"Troy"]],
+      [[6,"North Carolina"],[11,"VCU"]],
+      [[3,"Illinois"],[14,"U Penn"]],
+      [[7,"Saint Mary's"],[10,"Texas AM"]],
+      [[2,"Houston"],[15,"Idaho"]]
+    ]
+  },
+  "West": {
+    r1: [
+      [[1,"Arizona"],[16,"LIU"]],
+      [[8,"Villanova"],[9,"Utah State"]],
+      [[5,"Wisconsin"],[12,"High Point"]],
+      [[4,"Arkansas"],[13,"Hawaii"]],
+      [[6,"BYU"],[11,"Texas"]],
+      [[3,"Gonzaga"],[14,"Kennesaw St"]],
+      [[7,"Miami FL"],[10,"Missouri"]],
+      [[2,"Purdue"],[15,"Queens"]]
+    ]
+  },
+  "Midwest": {
+    r1: [
+      [[1,"Michigan"],[16,"Howard"]],
+      [[8,"Georgia"],[9,"Saint Louis"]],
+      [[5,"Texas Tech"],[12,"Akron"]],
+      [[4,"Alabama"],[13,"Hofstra"]],
+      [[6,"Tennessee"],[11,"Miami OH"]],
+      [[3,"Virginia"],[14,"Wright State"]],
+      [[7,"Kentucky"],[10,"Santa Clara"]],
+      [[2,"Iowa State"],[15,"Tennessee State"]]
+    ]
+  }
+};
+
+function getR2Matchups(r1) {
+  // R2 matchups: winners of games 0v1, 2v3, 4v5, 6v7
+  const pairs = [[0,1],[2,3],[4,5],[6,7]];
+  return pairs.map(([a,b]) => {
+    const wA = getWinner(r1[a]);
+    const wB = getWinner(r1[b]);
+    return [wA, wB];
+  });
+}
+
+function getS16Matchups(r2) {
+  const pairs = [[0,1],[2,3]];
+  return pairs.map(([a,b]) => {
+    const wA = getR2Winner(r2[a]);
+    const wB = getR2Winner(r2[b]);
+    return [wA, wB];
+  });
+}
+
+function getWinner(game) {
+  const [a, b] = game;
+  const sA = getTeamStatus(a[1]), sB = getTeamStatus(b[1]);
+  if (sA.status === "won" || sB.status === "lost") return a;
+  if (sB.status === "won" || sA.status === "lost") return b;
+  return null;
+}
+
+function getR2Winner(pair) {
+  if (!pair[0] || !pair[1]) return null;
+  const sA = getTeamStatus(pair[0][1]), sB = getTeamStatus(pair[1][1]);
+  if (sA.status === "won" && sA.round >= 2) return pair[0];
+  if (sB.status === "won" && sB.round >= 2) return pair[1];
+  if (sA.status === "lost" && sA.round === 2) return pair[1];
+  if (sB.status === "lost" && sB.round === 2) return pair[0];
+  return null;
+}
+
+function teamCls(team) {
+  if (!team) return "pending";
+  const s = getTeamStatus(team[1]);
+  if (s.status === "won") return "win";
+  if (s.status === "lost") return "lose";
+  return "pending";
+}
+
+function teamHtml(team, fallback) {
+  if (!team) return `<div class="brk-team pending"><span class="brk-seed">—</span><span class="brk-name">${fallback || "TBD"}</span></div>`;
+  return `<div class="brk-team ${teamCls(team)}"><span class="brk-seed">${team[0]}</span><span class="brk-name">${team[1]}</span></div>`;
+}
+
+function renderBracket() {
+  const wrap = document.getElementById("bracketWrap");
+  let h = `<div class="bracket-regions">`;
+  for (const [region, data] of Object.entries(BRACKET)) {
+    const r1 = data.r1;
+    const r2 = getR2Matchups(r1);
+    const s16 = getS16Matchups(r2);
+    h += `<div class="region-card"><div class="region-title">${region} Region</div>`;
+    h += `<div class="bracket-grid">`;
+    // R1 column
+    h += `<div><div class="brk-round-hd">Round 1</div>`;
+    for (const game of r1) {
+      h += `<div class="brk-game">${teamHtml(game[0])}${teamHtml(game[1])}</div>`;
+    }
+    h += `</div>`;
+    // R2 column
+    h += `<div><div class="brk-round-hd">Round 2</div>`;
+    for (let i = 0; i < 4; i++) {
+      const a = r2[i][0], b = r2[i][1];
+      h += `<div class="brk-game" style="margin-top:${i===0?'12':'18'}px">${teamHtml(a)}${teamHtml(b)}</div>`;
+    }
+    h += `</div>`;
+    // Sweet 16 column
+    h += `<div><div class="brk-round-hd">Sweet 16</div>`;
+    for (let i = 0; i < 2; i++) {
+      const a = s16[i][0], b = s16[i][1];
+      h += `<div class="brk-game" style="margin-top:${i===0?'38':'50'}px">${teamHtml(a)}${teamHtml(b)}</div>`;
+    }
+    h += `</div>`;
+    h += `</div></div>`;
+  }
+  h += `</div>`;
+  wrap.innerHTML = h;
+}
+
+// ============ ADMIN ============
+function toggleAdmin() {
+  const p = document.getElementById("adminPanel");
+  p.classList.toggle("show");
+  if (!p.innerHTML) renderAdmin();
+}
+
+function renderAdmin() {
+  const panel = document.getElementById("adminPanel");
+  const allTeams = {};
+  for (const tier of Object.values(POOL_DATA))
+    for (const entry of tier)
+      for (const [seed, team] of Object.entries(entry.picks)) {
+        const t = normalizeTeam(team);
+        if (!allTeams[seed]) allTeams[seed] = new Set();
+        allTeams[seed].add(t);
+      }
+
+  let h = `<h3>Update Game Results</h3><p style="color:var(--muted);font-size:12px;margin-bottom:14px">Click to cycle: <span style="color:var(--muted)">Pending</span> → <span style="color:var(--green)">Won R1</span> → <span style="color:var(--green)">Won R2</span> → ... → <span style="color:var(--red)">Lost</span> → Pending</p>`;
+  for (let s = 1; s <= 16; s++) {
+    const teams = allTeams[String(s)] ? [...allTeams[String(s)]].sort() : [];
+    h += `<div class="seed-section"><h4>#${s} Seed</h4><div class="seed-grid">`;
+    for (const team of teams) {
+      const info = getTeamStatus(team);
+      const cls = info.status === "won" ? "won" : info.status === "lost" ? "lost" : "";
+      const label = info.status === "won" ? `✅ R${info.round}` : info.status === "lost" ? "❌" : "⏳";
+      h += `<button class="team-btn ${cls}" onclick="cycleResult('${team.replace(/'/g,"\\'")}')"><span class="sn">${s}</span>${team} ${label}</button>`;
+    }
+    h += "</div></div>";
+  }
+  h += `<div class="admin-btns">
+    <button class="btn-copy" onclick="exportResults()">📋 Copy Results</button>
+  </div>
+  <div style="margin-top:10px">
+    <textarea id="importArea" style="width:100%;height:50px;background:var(--card2);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:8px;font-size:11px;font-family:monospace;margin-top:4px" placeholder="Paste JSON to restore..."></textarea>
+    <button class="btn-import" style="margin-top:4px" onclick="importResults()">Import</button>
+  </div>`;
+  panel.innerHTML = h;
+}
+
+function cycleResult(team) {
+  const info = RESULTS[team] || {status:"pending"};
+  if (info.status === "pending") {
+    RESULTS[team] = {status:"won", round:1};
+  } else if (info.status === "won") {
+    const next = (info.round || 1) + 1;
+    if (next <= 6) RESULTS[team] = {status:"won", round:next};
+    else RESULTS[team] = {status:"lost", round:6};
+  } else {
+    RESULTS[team] = {status:"pending"};
+  }
+  localStorage.setItem("bigdaddy_results", JSON.stringify(RESULTS));
+  oddsNeedRecalc = true; _seedMap = null;
+  renderAdmin(); renderStats(); renderTable();
+  oddsNeedRecalc = false;
+}
+
+function exportResults() {
+  navigator.clipboard.writeText(JSON.stringify(RESULTS, null, 2)).then(() => alert("Copied!"));
+}
+
+function importResults() {
+  try {
+    Object.assign(RESULTS, JSON.parse(document.getElementById("importArea").value));
+    localStorage.setItem("bigdaddy_results", JSON.stringify(RESULTS));
+    oddsNeedRecalc = true; _seedMap = null;
+    renderAdmin(); renderStats(); renderTable();
+    oddsNeedRecalc = false;
+    alert("Imported!");
+  } catch(e) { alert("Invalid JSON: " + e.message); }
+}
+
+function loadSaved() {
+  try {
+    const s = localStorage.getItem("bigdaddy_results");
+    if (s) Object.assign(RESULTS, JSON.parse(s));
+  } catch(e) {}
+}
+
+// ============ INIT ============
+function render() { renderTabs(); renderStats(); renderPayouts(); renderTable(); }
+document.getElementById("ts").textContent = new Date().toLocaleString();
+loadSaved();
+render();
+</script>
+</body>
+</html>
